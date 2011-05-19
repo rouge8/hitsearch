@@ -1,0 +1,18 @@
+Andy Freeland and Dan Levy and Conrad Dean
+Data Mining Final Project Proposal
+
+As Dan Levy thinks that the HITS algorithm is the coolest thing ever (and Andy and Conrad also think it's pretty cool), we plan to implement HITS.
+
+DAN TALK ABOUT WHAT YOU DISCUSSED WITH DAVE
+
+While that is all right, we would like to do something cooler, like make a search engine. We don't expect to make a really good search engine, maybe not even one with a real crawler. If making a useful crawler proves too hard, we'll come up with one that crawls/searchs a (hopefully fairly large) set of pages that we will download in advance.
+
+To do this, we will have to:
+- implement HITS.
+- Maybe write some sort of crawler (that respects robots.txt!) (or find a decent one or just download pages in advance).
+- Come up with some way to index pages, possibly using title tags, meta tags, information from links, whatever.
+- Come up with some way to search pages. This part will probably not be very good, as we don't have much (any?) background in natural language processing. We could restrict it to Boolean searches or structured queries, which would probably make our lives easier.
+
+We will need to read up on some of these things [Wikipedia](http://en.wikipedia.org/wiki/Web_search_engine) seems like a good starting place.
+
+This is super ambitious, but we hope it will be super fun.
