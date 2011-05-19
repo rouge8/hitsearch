@@ -2,3 +2,5 @@ WEB CRAWLER:
     if we don't write our own, [this](https://github.com/theanti9/PyCrawler/blob/master/PyCrawler.py) might be a good starting point...
     or [this](http://blog.theanti9.com/2009/02/14/python-web-crawler-in-less-than-50-lines/)
     or [scrapy](http://scrapy.org/)
+    <http://www.grenadepod.com/2009/12/13/python-web-crawler/>
+    all of this came from <http://stackoverflow.com/questions/419235/anyone-know-of-a-good-python-based-web-crawler-that-i-could-use>
