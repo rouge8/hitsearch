@@ -12,6 +12,10 @@ Also, it should keep a record of previously explored pages so it doesn't do anyt
 
 #TODO
 '''
+implement depth limiter
+
+implement rest counter
+
 make word frequency counter work
 
 implement a constraint so it won't explore outside of its nth parent.
