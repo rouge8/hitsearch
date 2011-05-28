@@ -22,3 +22,10 @@ Icon?
 # Files that might appear on external disk
 .Spotlight-V100
 .Trashes
+
+### Python Dependencies
+flask
+flaskext
+jinja2
+sqlalchemy
+werkzeug
