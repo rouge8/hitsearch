@@ -1,4 +1,3 @@
 #!/bin/sh
 
-rm -rf django
-rm django.tar.gz
+rm -r hitsearch/ django
