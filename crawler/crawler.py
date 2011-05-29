@@ -59,8 +59,6 @@ class Page(HTMLParser):
             #print "content not loaded, loading now..."
             self._content = str(urllib2.urlopen(self.url).read())
         return self._content
-        
-        
 
     @property
     def links(self):
@@ -103,7 +101,7 @@ class Crawler:
                     pickled_dictionary_file="meh",
                     depth=5):
         
-        self.pages_to_visit = [Page(start_page)]  # queue for pages to load
+        self.pages_to_visit = [Page(start_page),0]  # queue for pages to load
         self.rest = rest  # time in ms to wait between pageloads
         # database structure:
         # database[url_to_page] = ([link1,link2,...], {word:word_count,...})
@@ -119,8 +117,9 @@ class Crawler:
     def start(self):
         
         while len(self.pages_to_visit) > 0:
-            current_page = self.pages_to_visit.pop(0)
-            if current_page.url in self.database:
+            time.sleep(self.rest/1000.0)
+            current_page,distance_from_start = self.pages_to_visit.pop(0)
+            if current_page.url in self.database or distance_from_start > self.depth:
                 continue #to next page on the list
 
             self.database[current_page.url] = ([], {}) # so you don't visit it again
@@ -130,7 +129,7 @@ class Crawler:
             word_counts = current_page.words
             self.database[current_page.url] = (links, word_counts)
             for url in links:
-                self.pages_to_visit.append(Page(url))
+                self.pages_to_visit.append(Page(url),distance_from_start+1)
                 #print "\t",filename
             #good.append(current_page)
             """
