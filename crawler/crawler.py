@@ -32,6 +32,7 @@ database is a pickled dictionary right now.  we should fix that
 import pickle
 import urllib2
 import urlparse
+import time
 from HTMLParser import HTMLParser
 class Page(HTMLParser):
 
@@ -101,7 +102,7 @@ class Crawler:
                     pickled_dictionary_file="meh",
                     depth=5):
         
-        self.pages_to_visit = [Page(start_page),0]  # queue for pages to load
+        self.pages_to_visit = [(Page(start_page),0)]  # queue for pages to load
         self.rest = rest  # time in ms to wait between pageloads
         # database structure:
         # database[url_to_page] = ([link1,link2,...], {word:word_count,...})
@@ -129,7 +130,7 @@ class Crawler:
             word_counts = current_page.words
             self.database[current_page.url] = (links, word_counts)
             for url in links:
-                self.pages_to_visit.append(Page(url),distance_from_start+1)
+                self.pages_to_visit.append((Page(url),distance_from_start+1))
                 #print "\t",filename
             #good.append(current_page)
             """
