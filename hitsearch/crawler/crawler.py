@@ -91,6 +91,12 @@ class Page(HTMLParser):
         else:
             return url
 
+    def __eq__(self,y):
+        if type(y) is str:
+            return self.url == y
+        else:
+            return self.url == y.url
+
 
 class Crawler:
 
@@ -108,7 +114,7 @@ class Crawler:
             with open(pickled_dictionary_file,"rb") as f:
                 self.database = pickle.load(f)
         else:
-            self.database = {}
+            self.database = []
         self.depth = depth if depth > 0 else float("inf") # distance allowed from start page
 
 
@@ -117,17 +123,18 @@ class Crawler:
         while len(self.pages_to_visit) > 0:
             time.sleep(self.rest/1000.0)
             current_page,distance_from_start = self.pages_to_visit.pop(0)
-            if current_page.url in self.database or distance_from_start > self.depth:
+            if current_page in self.database or distance_from_start > self.depth:
                 continue #to next page on the list
             print "checking out page",current_page.url
 
-            self.database[current_page.url] = ([], {}) # so you don't visit it again
+            #self.database[current_page.url] = ([], {}) # so you don't visit it again
+            self.database.append(current_page)
             #print current_page.url
             #try:
-            links = current_page.links
-            word_counts = current_page.words
-            self.database[current_page.url] = (links, word_counts)
-            for url in links:
+            #links = current_page.links
+            #word_counts = current_page.words
+            #self.database[current_page.url] = (links, word_counts)
+            for url in current_page.links:
                 self.pages_to_visit.append((Page(url),distance_from_start+1))
                 #print "\t",filename
             #good.append(current_page)
