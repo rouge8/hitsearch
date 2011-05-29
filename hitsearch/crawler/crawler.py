@@ -12,10 +12,6 @@ Also, it should keep a record of previously explored pages so it doesn't do anyt
 
 #TODO
 '''
-implement depth limiter
-
-implement rest counter
-
 make word frequency counter work
 
 implement a constraint so it won't explore outside of its nth parent.
@@ -103,7 +99,8 @@ class Crawler:
                     depth=5):
         
         self.pages_to_visit = [(Page(start_page),0)]  # queue for pages to load
-        self.rest = rest  # time in ms to wait between pageloads
+        # time in ms to wait between pageloads
+        self.rest = rest
         # database structure:
         # database[url_to_page] = ([link1,link2,...], {word:word_count,...})
         db = False
@@ -112,7 +109,7 @@ class Crawler:
                 self.database = pickle.load(f)
         else:
             self.database = {}
-        self.depth=5  # distance allowed from start page
+        self.depth = depth if depth > 0 else float("inf") # distance allowed from start page
 
 
     def start(self):
@@ -122,6 +119,7 @@ class Crawler:
             current_page,distance_from_start = self.pages_to_visit.pop(0)
             if current_page.url in self.database or distance_from_start > self.depth:
                 continue #to next page on the list
+            print "checking out page",current_page.url
 
             self.database[current_page.url] = ([], {}) # so you don't visit it again
             #print current_page.url
