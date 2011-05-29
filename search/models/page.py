@@ -1,15 +1,14 @@
-from sqlalchemy import Column, Integer, String, DateTime, Float
-from search.database import Base
+from search import db
 import datetime
 
-class Page(Base):
+class Page(db.Model):
     """Represents a webpage in the database."""
     __tablename__ = 'pages'
-    id = Column(Integer, primary_key=True)
-    url = Column(String, unique=True)
-    discovery_time = Column(DateTime)
-    authority = Column(Float)
-    hubbiness = Column(Float)
+    id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(db.String, unique=True)
+    discovery_time = db.Column(db.DateTime)
+    authority = db.Column(db.Float)
+    hubbiness = db.Column(db.Float)
 
     def __init__(self, url):
         self.url = url
