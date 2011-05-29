@@ -22,8 +22,6 @@ implement a constraint so it won't explore outside of its nth parent.
     parent = 3 -> explores *
     parent = -1 -> explores *
 
-database is a pickled dictionary right now.  we should fix that
-
 '''
 import pickle
 import urllib2
@@ -34,7 +32,8 @@ class Page(HTMLParser):
 
     def __init__(self,url):
         HTMLParser.__init__(self)
-        self.link_list = []
+        self.link_list = None
+        self.word_counts = None
         self.url = url
         self._content = None
 
@@ -52,20 +51,22 @@ class Page(HTMLParser):
 
     @property
     def content(self):
-        if self._content == None:
-            #print "content not loaded, loading now..."
+        if self._content is None:
+            print "content not loaded, loading now..."
             self._content = str(urllib2.urlopen(self.url).read())
         return self._content
 
     @property
     def links(self):
-        self.feed(self.content)
+        if self.link_list is None:
+            self.feed(self.content)
         return self.link_list
 
     @property
     def words(self):
-        #self.generateWordCount()
-        self.word_counts = {"what":90}
+        if self.word_counts is None:
+            #self.generateWordCount()
+            self.word_counts = {"what":90}
         return self.word_counts
 
 
