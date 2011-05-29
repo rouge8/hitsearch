@@ -1,4 +1,4 @@
 #!/bin/sh
 # unpacks all dependencies
 
-tar zxvf dependencies.tar.gz
+tar zxvf django.tar.gz

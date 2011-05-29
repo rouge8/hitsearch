@@ -24,8 +24,5 @@ Icon?
 .Trashes
 
 ### Python Dependencies
-flask
-flaskext
-jinja2
-sqlalchemy
-werkzeug
+django
+django-admin.py
