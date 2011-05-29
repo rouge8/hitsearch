@@ -10,6 +10,8 @@ class Page(db.Model):
     authority = db.Column(db.Float)
     hubbiness = db.Column(db.Float)
 
+    tags = db.relationship('Tag', backref='pages', lazy='dynamic')
+
     def __init__(self, url):
         self.url = url
         self.discovery_time = datetime.datetime.now()
