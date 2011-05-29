@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, String, DateTime, Float # and whatever other things we need
-from hitsearch.database import Base
+from sqlalchemy import Column, Integer, String, DateTime, Float
+from search.database import Base
 import datetime
 
 class Page(Base):
