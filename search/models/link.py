@@ -13,6 +13,6 @@ class Link(db.Model):
     __table_args__ = (db.UniqueConstraint("target_id", "source_id", "text"), {})
 
     def __init__(self, target, source, text):
-        self.target = target
-        self.source = source
+        self.target_id = target_id
+        self.source_id = source_id
         self.text = text
