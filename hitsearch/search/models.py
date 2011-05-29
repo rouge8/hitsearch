@@ -4,8 +4,8 @@ from datetime import datetime
 class Page(models.Model):
     url = models.CharField(max_length=500, unique=True)
     discovery_time=(models.DateTimeField(default=datetime.now()))
-    authority = models.FloatField()
-    hubbiness = models.FloatField()
+    authority = models.FloatField(blank=True, null=True)
+    hubbiness = models.FloatField(blank=True, null=True)
 
     def __unicode__(self):
         return self.url
