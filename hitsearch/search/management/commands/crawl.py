@@ -7,14 +7,15 @@ class Command(BaseCommand):
     help = 'Crawls the internet!'
 
     def handle(self, *args, **options):
-        start = Page(start_site)
-        start.save()
+        spider = Crawler(start_site)
+        spider.start()
         ## SOMEHOW GET STUFF FROM CRAWLER
-        for url that crawler returned:
-            page = Page(url)
-            link = Link(target, source, text)
-            page.save()
-            link.save()
+        for page in spider.database: # database is a list of hitsearch.crawler.Page() objects
+            page_object = Page(page.url)
+            for link in page.links:
+                link_object = Link(link, page.url)  # should make .links return text too
+                link_object.save()
+            page_object.save()
 
 #### THIS IS THE GENERAL IDEA ANYWAY....
 #### from https://docs.djangoproject.com/en/1.3/howto/custom-management-commands/
