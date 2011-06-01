@@ -16,7 +16,7 @@ class Link(models.Model):
     text = models.TextField()
 
     class Meta:
-        unique_together = ('target', 'source')
+        unique_together = ('target', 'source', 'text')
         # should text also be here?
         # if so, then it's possible for one source page to have multiple links
         # to a target page but with different text
