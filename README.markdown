@@ -7,9 +7,10 @@ This engine is based off the Django framework.  Fortunately we've included the e
 # How to Run
 
 1. Unpack the dependencies by running `./setup-dependencies.sh`.
-2. To run the development server and host it locally for testing. `python hitsearch/manage.py runserver` to launch the server!
-3. Go to `http://localhost:8000/`  You'll see some stuff!
-4. Cool, now run `python hitsearch/manage.py syncdb` to setup the database stuff
+2. To run the development server and host it locally for testing. `./syncdb` to setup the database
+3. `./runserver` to run the development server
+4. .. populate your database, run the webcrawler
+5. try a test search! 
 
 # Cleanup
 
