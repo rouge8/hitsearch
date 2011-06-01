@@ -22,7 +22,7 @@ class Link(models.Model):
         # to a target page but with different text
 
     def __unicode__(self):
-        output = str(self.source) + ' --> ' + str(self.target)
+        output = unicode(self.source) + ' --> ' + unicode(self.target)
         return output
 
 class Tag(models.Model):
@@ -32,4 +32,4 @@ class Tag(models.Model):
     # should there be a type attribute? i.e. title, meta, content, link, etc.?
 
     def __unicode__(self):
-        return str(self.page) + ': ' str(self.tag)
+        return unicode(self.page) + ': ' + unicode(self.tag)
