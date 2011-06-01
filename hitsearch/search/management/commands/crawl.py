@@ -7,6 +7,10 @@ class Command(BaseCommand):
     help = 'Crawls the internet!'
 
     def handle(self, *args, **options):
+        start_site = args[0]
+        if len(args) > 1: depth = args[1]
+        else: depth = None
+
         spider = Crawler(start_site)
         spider.start()
         ## SOMEHOW GET STUFF FROM CRAWLER
