@@ -43,8 +43,8 @@ class Page(HTMLParser):
 
     def add_to_list_of_links(self,attrs):
         linkstuff = attrs[0]
-        type,url = linkstuff
-        if type == "href":
+        tag_type,url = linkstuff
+        if tag_type == "href":
             url = urlparse.urljoin(self.url,url)  #translate link to proper url
             if self.isValidLink(url):
                 self.link_list.append(url)
@@ -59,6 +59,7 @@ class Page(HTMLParser):
     @property
     def links(self):
         if self.link_list is None:
+            self.link_list = []
             self.feed(self.content)
         return self.link_list
 
