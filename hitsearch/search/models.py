@@ -27,9 +27,13 @@ class Link(models.Model):
 
 class Tag(models.Model):
     page = models.ForeignKey(Page)
-    importance = models.FloatField() # should this be word frequency or something else?
-    tag = models.CharField(500)
+    term_frequency = models.FloatField()
+    term_frequency_idf = models.FloatField() # we may or may not use this
+    tag = models.CharField(max_length=500)
     # should there be a type attribute? i.e. title, meta, content, link, etc.?
+
+    class Meta:
+        unique_together = ('page', 'tag')
 
     def __unicode__(self):
         return unicode(self.page) + ': ' + unicode(self.tag)
