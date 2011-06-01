@@ -11,8 +11,8 @@ class Page(models.Model):
         return self.url
 
 class Link(models.Model):
-    target = models.ForeignKey(Page)
-    source = models.ForeignKey(Page)
+    target = models.ForeignKey(Page, related_name='link_target')
+    source = models.ForeignKey(Page, related_name='link_source')
     text = models.TextField()
 
     class Meta:
