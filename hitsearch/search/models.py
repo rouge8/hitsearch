@@ -13,7 +13,7 @@ class Page(models.Model):
 class Link(models.Model):
     target = models.ForeignKey(Page, related_name='link_target')
     source = models.ForeignKey(Page, related_name='link_source')
-    text = models.TextField()
+    text = models.TextField(blank=True, null=True)
 
     class Meta:
         unique_together = ('target', 'source', 'text')
@@ -28,7 +28,7 @@ class Link(models.Model):
 class Tag(models.Model):
     page = models.ForeignKey(Page)
     term_frequency = models.FloatField()
-    term_frequency_idf = models.FloatField() # we may or may not use this
+    term_frequency_idf = models.FloatField(blank=True, null=True) # we may or may not use this
     tag = models.CharField(max_length=500)
     # should there be a type attribute? i.e. title, meta, content, link, etc.?
 
