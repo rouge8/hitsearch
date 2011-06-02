@@ -25,6 +25,3 @@ class Command(BaseCommand):
 
 #### THIS IS THE GENERAL IDEA ANYWAY....
 #### from https://docs.djangoproject.com/en/1.3/howto/custom-management-commands/
-            
-
-

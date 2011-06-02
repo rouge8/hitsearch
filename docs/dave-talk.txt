@@ -18,3 +18,5 @@ HITS (Kleinberg) paper! topic sensitive like
 USE BEAUTIFUL SOUP TO MAKE HTML PARSING BETTER?
 
 threads!
+
+GET LIST OF STOP WORDS TO IGNORE
