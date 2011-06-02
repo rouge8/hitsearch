@@ -13,13 +13,15 @@ class Command(BaseCommand):
 
         spider = Crawler(start_site)
         spider.start()
-        ## SOMEHOW GET STUFF FROM CRAWLER
+        
         for page in spider.database: # database is a list of hitsearch.crawler.Page() objects
-            page_object = Page(page.url)
-            for link in page.links:
-                link_object = Link(link, page.url)  # should make .links return text too
-                link_object.save()
+            page_object,created = Page.objects.get_or_create(url=page.url)
             page_object.save()
+            for link in page.links:
+                target_object,created = Page.objects.get_or_create(url=link)
+                target_object.save()
+                link_object,created = Link.objects.get_or_create(target=target_object, source=page_object)  # should make .links return text too
+                link_object.save()
 
 #### THIS IS THE GENERAL IDEA ANYWAY....
 #### from https://docs.djangoproject.com/en/1.3/howto/custom-management-commands/
