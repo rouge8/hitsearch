@@ -2,7 +2,7 @@ from django.db import models
 from datetime import datetime
 
 class Page(models.Model):
-    url = models.CharField(max_length=500, unique=True)
+    url = models.CharField(max_length=500, unique=True, db_index=True)
     discovery_time=(models.DateTimeField(default=datetime.now()))
     authority = models.FloatField(blank=True, null=True)
     hubbiness = models.FloatField(blank=True, null=True)
@@ -11,8 +11,8 @@ class Page(models.Model):
         return self.url
 
 class Link(models.Model):
-    target = models.ForeignKey(Page, related_name='link_target')
-    source = models.ForeignKey(Page, related_name='link_source')
+    target = models.ForeignKey(Page, related_name='link_target', db_index=True)
+    source = models.ForeignKey(Page, related_name='link_source', db_index=True)
     text = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -28,9 +28,7 @@ class Link(models.Model):
 class Tag(models.Model):
     page = models.ForeignKey(Page)
     term_frequency = models.FloatField()
-    term_frequency_idf = models.FloatField(blank=True, null=True) # we may or may not use this
-    tag = models.CharField(max_length=500)
-    # should there be a type attribute? i.e. title, meta, content, link, etc.?
+    tag = models.CharField(max_length=500, db_index=True)
 
     class Meta:
         unique_together = ('page', 'tag')
