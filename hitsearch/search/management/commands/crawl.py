@@ -25,6 +25,12 @@ class Command(BaseCommand):
                 target_object.save()
                 link_object,created = Link.objects.get_or_create(target=target_object, source=page_object)  # should make .links return text too
                 link_object.save()
+                
+            # save word counts!
+            print page.word_count
+            for word in page.word_count.keys():
+                word_object, created = Tag.objects.get_or_create(page=page_object,
+                    tag=word, word_count = page.word_count[word])
 
 #### THIS IS THE GENERAL IDEA ANYWAY....
 #### from https://docs.djangoproject.com/en/1.3/howto/custom-management-commands/

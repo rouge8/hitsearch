@@ -32,4 +32,4 @@ class Tag(models.Model):
         unique_together = ('page', 'tag')
 
     def __unicode__(self):
-        return unicode(self.page) + ': ' + unicode(self.tag)
+        return unicode(self.page) + ': ' + unicode(self.tag) + ', ' + unicode(self.word_count)
