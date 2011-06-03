@@ -77,7 +77,8 @@ class Page:
         
         # count words!
         body = soup.body(text=True)
-        words = ''.join(body).split()
+        title = soup.title(text=True)
+        words = ' '.join(body).split() + ' '.join(title).split()
         words = [utils.sanitize(word).lower() for word in words if len(word) != 0]
         self.word_count = Counter(words) 
 
@@ -89,7 +90,7 @@ class Page:
     
     def standardize_url(self,url):
         url = self.strip_anchor(url)
-        url = resolve_components(url)
+        url = self.resolve_components(url)
         return url
     
     def resolve_components(self,url):
