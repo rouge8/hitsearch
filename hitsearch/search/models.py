@@ -24,7 +24,8 @@ class Link(models.Model):
 
 class Tag(models.Model):
     page = models.ForeignKey(Page)
-    term_frequency = models.FloatField()
+    word_count = models.IntegerField()
+    term_frequency = models.FloatField(blank=True, null=True)
     tag = models.CharField(max_length=500, db_index=True)
 
     class Meta:
