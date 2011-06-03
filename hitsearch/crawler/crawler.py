@@ -1,4 +1,4 @@
-# Conrad Dean
+# Conrad Dean and Andy Freeland
 
 
 # Explores the Internet so you don't have to!
@@ -12,8 +12,6 @@ Also, it should keep a record of previously explored pages so it doesn't do anyt
 
 #TODO
 '''
-make word frequency counter work
-
 implement a constraint so it won't explore outside of its nth parent.
     example: carleton.edu/cs/comps/
     parent = 0 -> explores carleton.edu/cs/comps/*
@@ -23,68 +21,57 @@ implement a constraint so it won't explore outside of its nth parent.
     parent = -1 -> explores *
 
 '''
-import pickle
+
 import urllib2
 import urlparse
 import time
-from HTMLParser import HTMLParser
-class Page(HTMLParser):
+import BeautifulSoup
+import utils
+from counter import Counter
 
-    def __init__(self,url):
-        HTMLParser.__init__(self)
-        self.link_list = None
+class Page:
+    def __init__(self, url):
+        self.links = []
         self.word_counts = None
         self.url = url
-        self._content = None
+        self.content = None
+        self.parse_page()
 
-    def handle_starttag(self, tag, attrs):
-        if tag == "a":
-            self.add_to_list_of_links(attrs)
+    def parse_page(self):
+        page = urllib2.urlopen(self.url)
+        soup = BeautifulSoup.BeautifulSoup(page) # what if it fails to parse?
+        links = soup('a')
+        self.get_links(links)
+        self.get_content(soup)
 
-    def add_to_list_of_links(self,attrs):
-        linkstuff = attrs[0]
-        tag_type,url = linkstuff
-        if tag_type == "href":
-            url = urlparse.urljoin(self.url,url)  #translate link to proper url
-            if self.isValidLink(url):
-                self.link_list.append(url)
+    def get_links(self, links):
+        for link in links:
+            target = link.get('href', '')
+            if target != '':
+                target = urlparse.urljoin(self.url, target) # translate link to proper url
+                if self.is_valid_link(target):
+                    self.links.append(target)
 
-    @property
-    def content(self):
-        if self._content is None:
-            print "content not loaded, loading now..."
-            self._content = str(urllib2.urlopen(self.url).read())
-        return self._content
+    def get_content(self, soup):
+        # based on http://groups.google.com/group/beautifulsoup/browse_thread/thread/9f6278ee2a2e4564
+        #remove comments
+        comments = soup.findAll(text=lambda text:isinstance(text, 
+            BeautifulSoup.Comment))
+        [comment.extract() for comment in comments]
+        # remove javascript
+        js = soup.findAll('script')
+        [tag.extract() for tag in js]
+        body = soup.body(text=True)
+        self.content = ''.join(body)
+        words = self.content.split()
+        words = [utils.sanitize(word).lower() for word in words if len(word) != 0]
+        self.word_count = Counter(words) 
 
-    @property
-    def links(self):
-        if self.link_list is None:
-            self.link_list = []
-            self.feed(self.content)
-        return self.link_list
-
-    @property
-    def words(self):
-        if self.word_counts is None:
-            #self.generateWordCount()
-            self.word_counts = {"what":90}
-        return self.word_counts
-
-
-    def isValidLink(self,url):
-        #make based off appropriate parent setting
-        """ from pagerank assignment
-        if (
-            re.match( "^https?://apps.carleton.edu/curricular/cs/.*",url) and # stay within subsite
-            #not re.match( ".*/$",url) and  # skip links to pages that the server would have to resolve: "...cirricular/cs/major/"
-            #not re.match( ".*/@textonly=1",url) and
-            True
-            ):
-            return True
+    def __eq__(self,y):
+        if type(y) is str:
+            return self.url == y
         else:
-            return False
-            """
-        return True
+            return self.url == y.url
 
     def strip_anchor(self,url):
         if "#" in url:
@@ -93,11 +80,8 @@ class Page(HTMLParser):
         else:
             return url
 
-    def __eq__(self,y):
-        if type(y) is str:
-            return self.url == y
-        else:
-            return self.url == y.url
+    def is_valid_link(self,url):
+        return True
 
 
 class Crawler:
