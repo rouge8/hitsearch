@@ -24,6 +24,7 @@ implement a constraint so it won't explore outside of its nth parent.
 
 import urllib2
 import urlparse
+import posixpath
 import time
 import BeautifulSoup
 import utils
@@ -36,7 +37,7 @@ class Page:
     def __init__(self, url):
         self.links = []
         self.word_counts = None
-        self.url = url
+        self.url = self.standardize_url(url)
         try:
             self.parse_page()
         except urllib2.URLError, e:
@@ -60,6 +61,7 @@ class Page:
             target = link.get('href', '')
             if target != '':
                 target = urlparse.urljoin(self.url, target) # translate link to proper url
+                target = self.standardize_url(target) # standardize url
                 if self.is_valid_link(target):
                     self.links.append(target)
 
@@ -80,11 +82,33 @@ class Page:
         self.word_count = Counter(words) 
 
     def __eq__(self,y):
-        if type(y) is str:
-            return self.url == y
+        if type(y) is str or type(y) is unicode:
+            return self.url == self.standardize_url(y)
         else:
             return self.url == y.url
-
+    
+    def standardize_url(self,url):
+        url = self.strip_anchor(url)
+        url = resolve_components(url)
+        return url
+    
+    def resolve_components(self,url):
+        # taken from http://stackoverflow.com/questions/4317242/python-how-to-resolve-urls-containing/4317446#4317446
+        """
+        >>> resolveComponents('http://www.example.com/foo/bar/../../baz/bux/')
+        'http://www.example.com/baz/bux/'
+        >>> resolveComponents('http://www.example.com/some/path/../file.ext')
+        'http://www.example.com/some/file.ext'
+        """
+    
+        parsed = urlparse.urlparse(url)
+        new_path = posixpath.normpath(parsed.path)
+        if parsed.path.endswith('/'):
+            # Compensate for issue1707768
+            new_path += '/'
+        cleaned = parsed._replace(path=new_path)
+        return cleaned.geturl()
+    
     def strip_anchor(self,url):
         if "#" in url:
             now = url[:url.find('#')]
