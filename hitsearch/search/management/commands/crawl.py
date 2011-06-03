@@ -11,7 +11,10 @@ class Command(BaseCommand):
         if len(args) > 1: depth = args[1]
         else: depth = None
 
-        spider = Crawler(start_site)
+        if depth:
+            spider = Crawler(start_site,depth=int(depth))
+        else:
+            spider = Crawler(start_site)
         spider.start()
         
         for page in spider.database: # database is a list of hitsearch.crawler.Page() objects
