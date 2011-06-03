@@ -29,20 +29,31 @@ import BeautifulSoup
 import utils
 from counter import Counter
 
+class ParseError(Exception):
+    pass
+
 class Page:
     def __init__(self, url):
         self.links = []
         self.word_counts = None
         self.url = url
-        self.content = None
-        self.parse_page()
+        try:
+            self.parse_page()
+        except urllib2.URLError, e:
+            print 'URL_ERROR', self.url, e
+        except ParseError, e:
+            print 'PARSE_ERROR', e
 
     def parse_page(self):
         page = urllib2.urlopen(self.url)
-        soup = BeautifulSoup.BeautifulSoup(page) # what if it fails to parse?
+        strainer = BeautifulSoup.SoupStrainer({'a': True, 'title': True, 'body': True, 'script': True})
+        soup = BeautifulSoup.BeautifulSoup(page, parseOnlyThese=strainer) # what if it fails to parse?
         links = soup('a')
         self.get_links(links)
-        self.get_content(soup)
+        try:
+            self.get_content(soup)
+        except Exception, e:
+            raise ParseError( '%s could not be parsed.' % self.url )
 
     def get_links(self, links):
         for link in links:
@@ -55,15 +66,16 @@ class Page:
     def get_content(self, soup):
         # based on http://groups.google.com/group/beautifulsoup/browse_thread/thread/9f6278ee2a2e4564
         #remove comments
-        comments = soup.findAll(text=lambda text:isinstance(text, 
+        comments = soup(text=lambda text:isinstance(text, 
             BeautifulSoup.Comment))
         [comment.extract() for comment in comments]
         # remove javascript
-        js = soup.findAll('script')
+        js = soup('script')
         [tag.extract() for tag in js]
+        
+        # count words!
         body = soup.body(text=True)
-        self.content = ''.join(body)
-        words = self.content.split()
+        words = ''.join(body).split()
         words = [utils.sanitize(word).lower() for word in words if len(word) != 0]
         self.word_count = Counter(words) 
 
