@@ -26,6 +26,7 @@ import urllib2
 import urlparse
 import posixpath
 import time
+import httplib # for exceptions >_<
 import BeautifulSoup
 import utils
 from counter import Counter
@@ -57,6 +58,8 @@ class Page:
             soup = BeautifulSoup.BeautifulSoup(page, parseOnlyThese=strainer) # what if it fails to parse?
         except UnicodeEncodeError, e:
             raise ParseError('%s is not HTML.' % self.url)
+        except httplib.IncompleteRead, e:
+            raise ParseError(self.url +' '+  str(e))
         links = soup('a')
         self.get_links(links)
         try:
