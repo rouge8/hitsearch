@@ -17,6 +17,5 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 
     # search urls
-    url(r'^/?q=(?P<query>.*)', 'search.views.results'),
-    url(r'^', 'search.views.index'),
+    url(r'^$', 'search.views.index'),
 )
