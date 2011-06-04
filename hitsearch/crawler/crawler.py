@@ -36,7 +36,7 @@ class ParseError(Exception):
 class Page:
     def __init__(self, url):
         self.links = []
-        self.word_counts = None
+        self.word_counts = Counter()
         self.url = self.standardize_url(url)
         try:
             self.parse_page()
@@ -83,7 +83,7 @@ class Page:
         title = soup.title(text=True)
         words = ' '.join(body).split() + ' '.join(title).split()
         words = [utils.sanitize(word).lower() for word in words if len(word) != 0]
-        self.word_count = Counter(words) 
+        self.word_counts = Counter(words) 
 
     def __eq__(self,y):
         if type(y) is str or type(y) is unicode:
