@@ -144,7 +144,7 @@ class Crawler:
         self.depth = depth if depth > 0 else float("inf") # distance allowed from start page
 
 
-    def start(self):
+    def crawl(self):
         
         while len(self.pages_to_visit) > 0:
             time.sleep(self.rest/1000.0)
@@ -170,4 +170,6 @@ class Crawler:
                 bad.append(current_page)
                 continue
                 """
+
+            yield current_page
 
