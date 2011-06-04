@@ -87,6 +87,7 @@ class Page:
         body = soup.body(text=True)
         title = soup.title(text=True)
         self.title = ' '.join(title).strip()
+        if len(self.title) == 0: self.title = self.url
         words = ' '.join(body).split() + ' '.join(title).split()
         words = [utils.sanitize(word).lower() for word in words if len(word) != 0]
         self.word_counts = Counter(words) 
