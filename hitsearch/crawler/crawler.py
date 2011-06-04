@@ -121,7 +121,10 @@ class Page:
             # Compensate for issue1707768
             new_path += '/'
         cleaned = parsed._replace(path=new_path)
-        return cleaned.geturl()
+        if cleaned.geturl()[-1] == '.':
+            return cleaned.geturl()[:-1]
+        else:
+            return cleaned.geturl()
     
     def strip_anchor(self,url):
         if "#" in url:
