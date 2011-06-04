@@ -74,7 +74,7 @@ class Page:
 
     def get_content(self, soup):
         # based on http://groups.google.com/group/beautifulsoup/browse_thread/thread/9f6278ee2a2e4564
-        #remove comments
+        # remove comments
         comments = soup(text=lambda text:isinstance(text, 
             BeautifulSoup.Comment))
         [comment.extract() for comment in comments]
@@ -131,7 +131,6 @@ class Page:
 class Crawler:
 
     def __init__(self,start_page,rest=1000,
-                    pickled_dictionary_file="meh",
                     depth=5):
         
         try:
@@ -142,14 +141,7 @@ class Crawler:
 
         # time in ms to wait between pageloads
         self.rest = rest
-        # database structure:
-        # database[url_to_page] = ([link1,link2,...], {word:word_count,...})
-        db = False
-        if db:
-            with open(pickled_dictionary_file,"rb") as f:
-                self.database = pickle.load(f)
-        else:
-            self.database = []
+        self.database = []
         self.depth = depth if depth > 0 else float("inf") # distance allowed from start page
 
 
@@ -162,27 +154,14 @@ class Crawler:
                 continue #to next page on the list
             print "checking out page",current_page.url
 
-            #self.database[current_page.url] = ([], {}) # so you don't visit it again
             self.database.append(current_page)
-            #print current_page.url
-            #try:
-            #links = current_page.links
-            #word_counts = current_page.words
-            #self.database[current_page.url] = (links, word_counts)
+            
             for url in current_page.links:
                 try:
                     self.pages_to_visit.append((Page(url),distance_from_start+1))
                 except InvalidPageError, e:
                     print 'InvalidPageError', e
                     current_page.links.remove(url)
-                #print "\t",filename
-            #good.append(current_page)
-            """
-            except IOError:
-                #print "\tDoesn't exist, 404?"
-                bad.append(current_page)
-                continue
-                """
 
             yield current_page
 
