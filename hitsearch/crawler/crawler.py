@@ -33,17 +33,22 @@ from counter import Counter
 class ParseError(Exception):
     pass
 
+class InvalidPageError(Exception):
+    pass
+
 class Page:
     def __init__(self, url):
         self.links = []
-        self.word_counts = None
+        self.word_counts = Counter()
         self.url = self.standardize_url(url)
+        self.title = ''
         try:
             self.parse_page()
         except urllib2.URLError, e:
-            print 'URL_ERROR', self.url, e
+            e = self.url + ' ' + str(e)
+            raise InvalidPageError(e)
         except ParseError, e:
-            print 'PARSE_ERROR', e
+            raise InvalidPageError(str(e))
 
     def parse_page(self):
         page = urllib2.urlopen(self.url)
@@ -70,7 +75,7 @@ class Page:
 
     def get_content(self, soup):
         # based on http://groups.google.com/group/beautifulsoup/browse_thread/thread/9f6278ee2a2e4564
-        #remove comments
+        # remove comments
         comments = soup(text=lambda text:isinstance(text, 
             BeautifulSoup.Comment))
         [comment.extract() for comment in comments]
@@ -81,9 +86,10 @@ class Page:
         # count words!
         body = soup.body(text=True)
         title = soup.title(text=True)
+        self.title = ' '.join(title).strip()
         words = ' '.join(body).split() + ' '.join(title).split()
         words = [utils.sanitize(word).lower() for word in words if len(word) != 0]
-        self.word_count = Counter(words) 
+        self.word_counts = Counter(words) 
 
     def __eq__(self,y):
         if type(y) is str or type(y) is unicode:
@@ -127,24 +133,21 @@ class Page:
 class Crawler:
 
     def __init__(self,start_page,rest=1000,
-                    pickled_dictionary_file="meh",
                     depth=5):
         
-        self.pages_to_visit = [(Page(start_page),0)]  # queue for pages to load
+        try:
+            self.pages_to_visit = [(Page(start_page),0)]  # queue for pages to load
+        except InvalidPageError, e:
+            print 'InvalidPageError', e
+            self.pages_to_visit = []
+
         # time in ms to wait between pageloads
         self.rest = rest
-        # database structure:
-        # database[url_to_page] = ([link1,link2,...], {word:word_count,...})
-        db = False
-        if db:
-            with open(pickled_dictionary_file,"rb") as f:
-                self.database = pickle.load(f)
-        else:
-            self.database = []
+        self.database = []
         self.depth = depth if depth > 0 else float("inf") # distance allowed from start page
 
 
-    def start(self):
+    def crawl(self):
         
         while len(self.pages_to_visit) > 0:
             time.sleep(self.rest/1000.0)
@@ -153,21 +156,14 @@ class Crawler:
                 continue #to next page on the list
             print "checking out page",current_page.url
 
-            #self.database[current_page.url] = ([], {}) # so you don't visit it again
             self.database.append(current_page)
-            #print current_page.url
-            #try:
-            #links = current_page.links
-            #word_counts = current_page.words
-            #self.database[current_page.url] = (links, word_counts)
+            
             for url in current_page.links:
-                self.pages_to_visit.append((Page(url),distance_from_start+1))
-                #print "\t",filename
-            #good.append(current_page)
-            """
-            except IOError:
-                #print "\tDoesn't exist, 404?"
-                bad.append(current_page)
-                continue
-                """
+                try:
+                    self.pages_to_visit.append((Page(url),distance_from_start+1))
+                except InvalidPageError, e:
+                    print 'InvalidPageError', e
+                    current_page.links.remove(url)
+
+            yield current_page
 

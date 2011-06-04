@@ -6,6 +6,7 @@ class Page(models.Model):
     discovery_time=(models.DateTimeField(default=datetime.now()))
     authority = models.FloatField(blank=True, null=True)
     hubbiness = models.FloatField(blank=True, null=True)
+    title = models.CharField(max_length=120)
 
     def __unicode__(self):
         return self.url
