@@ -31,6 +31,7 @@ import BeautifulSoup
 import utils
 import socket
 from counter import Counter
+import threading
 
 class ParseError(Exception):
     pass
@@ -148,23 +149,13 @@ class Page:
     def is_valid_link(self,url):
         return True
 
-
-class Crawler:
-
-    def __init__(self,start_page,rest=1000,
-                    depth=5):
-        
-        self.pages_to_visit = [(Page(start_page),0)]  # queue for pages to load
-        # time in ms to wait between pageloads
-        self.rest = rest
-        self.database = []
-        self.depth = depth if depth > 0 else float("inf") # distance allowed from start page
-
-
-    def crawl(self):
-        
+class CrawlerWorker(threading.Thread):
+    def __init__(self,parent):
+        threading.Thread.__init__(self)
+        self.parent = parent
+    def run(self):
         while len(self.pages_to_visit) > 0:
-            current_page,distance_from_start = self.pages_to_visit.pop(0)
+            current_page,distance_from_start = self.pages_to_visit_pop()
             if current_page in self.database or distance_from_start > self.depth:
                 continue #to next page on the list
             sleep_time = (self.rest/1000.0) + 2**current_page.timeouts
@@ -181,16 +172,91 @@ class Crawler:
                 print 'TimeoutError', e
                 if current_page.timeouts > 3:
                     continue
-                self.pages_to_visit.append((current_page, distance_from_start))
+                self.add_page_to_pages_to_visit((current_page, distance_from_start))
 
-            self.database.append(current_page)
+            self.add_page_to_database(current_page)
             
             for url in current_page.links:
-                #try:
-                self.pages_to_visit.append((Page(url),distance_from_start+1))
-                #except InvalidPageError, e:
-                #    print 'InvalidPageError', e
-                #    current_page.links.remove(url)
+                self.add_page_to_database((Page(url),distance_from_start+1))
 
-            yield current_page
+            self.add_page_to_out_queue(current_page)
 
+    def add_page_to_out_queue(self,page):
+        self.parent.out_queue_lock.acquire()
+        self.parent.out_queue.append(page)
+        self.parent.out_queue_lock.release()
+
+    @property
+    def rest(self):
+        return self.parent.rest
+
+    @property
+    def depth(self):
+        return self.parent.depth
+
+    @property
+    def database(self):
+        return self.parent.database
+    
+    def add_page_to_database(self,page):
+        self.parent.database_lock.acquire()
+        self.parent.database.append(page)
+        self.parent.database_lock.release()
+
+    @property
+    def pages_to_visit(self):
+        return self.parent.pages_to_visit
+
+    def pages_to_visit_pop(self):
+        self.parent.pages_to_visit_lock.acquire()
+        page_to_vist = self.parent.pages_to_visit.pop(0)
+        self.parent.pages_to_visit._lockrelease()
+        return page_to_vist
+        
+    def add_page_to_pages_to_visit(self,page):
+        self.parent.pages_to_visit_lock.acquire()
+        self.parent.pages_to_visit.append(page)
+        self.parent.pages_to_visit._lockrelease()
+        
+
+class Crawler:
+
+    def __init__(self,
+                start_page,
+                rest=1000,
+                depth=5):
+        
+        self.pages_to_visit = [(Page(start_page),0)]  # queue for pages to load
+        # time in ms to wait between pageloads
+        self.rest = rest
+        self.database = []
+        self.depth = depth if depth > 0 else float("inf") # distance allowed from start page
+
+        # for multi-threaded crawler:not yet
+        #self.worker_threads = []
+        #self.worker_threads.append(CrawlerWorker(self))
+        self.worker_thread = CrawlerWorker(self)
+
+
+        # Thread-shared data structures
+        self.out_queue_lock = threading.Lock()
+        self.database_lock= threading.Lock()
+        self.pages_to_visit_lock= threading.Lock()
+
+        # Locks for shared data structures
+        self.out_queue_lock = threading.Lock()
+        self.database_lock= threading.Lock()
+        self.pages_to_visit_lock= threading.Lock()
+
+    def crawl(self):
+        self.worker_thread.start()
+        while True:
+            if len(self.out_queue) == 0 and not self.worker_thread.is_alive():
+                raise StopIteration
+            if len(self.out_queue) == 0:
+                sleep(.05)
+                continue
+            self.out_queue_lock.acquire()
+            page = self.out_queue.pop(0)
+            self.out_queue_lock.release()
+            yield page
