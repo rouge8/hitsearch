@@ -1,1 +1,2 @@
-./hitsearch/manage.py syncdb
+cd hitsearch/
+./manage.py syncdb

@@ -1,1 +1,2 @@
-./hitsearch/manage.py runserver
+cd hitsearch/
+./manage.py runserver
