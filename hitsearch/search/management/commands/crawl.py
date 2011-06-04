@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 from hitsearch.crawler import Crawler
 from hitsearch.search.models import *
 from datetime import datetime
@@ -7,6 +8,7 @@ class Command(BaseCommand):
     args = '<start_site depth>'
     help = 'Crawls the internet!'
 
+    @transaction.commit_manually
     def handle(self, *args, **options):
         start_site = args[0]
         if len(args) > 1: depth = args[1]
@@ -36,6 +38,7 @@ class Command(BaseCommand):
                     tag=word)
                 word_object.word_count = page.word_counts[word]
                 word_object.save()
+            transaction.commit()
 
 #### THIS IS THE GENERAL IDEA ANYWAY....
 #### from https://docs.djangoproject.com/en/1.3/howto/custom-management-commands/
