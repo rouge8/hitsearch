@@ -4,20 +4,26 @@
 <div class="search-form">
 
 <form method="get" action="/">
-    <input type="text" name="q" value="{{ q }}" autofocus>
-    <button type="submit">Search</button>
+    <input type="text" name="q" id="q" value="{{ q }}" autofocus>
+    <button type="submit">Search</button><br>
+    <div style="margin-top: 1em;">
+    <strong>sort by:</strong>
+    <input type="radio" name="s" value="a"{% if s != 'h' %} checked{% endif %}> <label for="s">authority</label> |
+    <input type="radio" name="s" value="h"{% if s == 'h' %}checked{% endif %}> <label for="s">hubbiness</label>
+    </div>
 </form>
 
 </div>
 
 <div id="results">
 {% if results %}{% for result in results %}
-<div class="result">
+<div class="result" onclick="window.location='{{ result.url }}'">
     <h3>{{ forloop.counter }}. <a href="{{ result.url }}">{{ result.title|safe }}</a></h3>
-    <p>authority: {{ result.authority }} | hubbiness: {{ result.hubbiness }}</p>
+    <p>authority: {{ result.authority|floatformat:5 }} | hubbiness: {{ result.hubbiness|floatformat:5 }}</p>
 </div>
 {% endfor %}{% else %}
-Sorry, no results{% endif %}
+<div class="result">
+    <h3>Sorry, no results</h3>{% endif %}
 </div>
-
+</div>
 {% endblock %}
