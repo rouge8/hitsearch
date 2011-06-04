@@ -41,6 +41,7 @@ class Page:
         self.links = []
         self.word_counts = Counter()
         self.url = self.standardize_url(url)
+        self.title = ''
         try:
             self.parse_page()
         except urllib2.URLError, e:
@@ -85,6 +86,7 @@ class Page:
         # count words!
         body = soup.body(text=True)
         title = soup.title(text=True)
+        self.title = ' '.join(title).strip()
         words = ' '.join(body).split() + ' '.join(title).split()
         words = [utils.sanitize(word).lower() for word in words if len(word) != 0]
         self.word_counts = Counter(words) 

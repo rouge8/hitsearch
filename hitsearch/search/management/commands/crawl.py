@@ -15,10 +15,10 @@ class Command(BaseCommand):
             spider = Crawler(start_site,depth=int(depth))
         else:
             spider = Crawler(start_site)
-        #spider.start()
         
         for page in spider.crawl(): # database is a list of hitsearch.crawler.Page() objects
             page_object,created = Page.objects.get_or_create(url=page.url)
+            page_object.title = page.title
             page_object.save()
             for link in page.links:
                 target_object,created = Page.objects.get_or_create(url=link)
