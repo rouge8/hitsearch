@@ -29,6 +29,7 @@ import time
 import httplib # for exceptions >_<
 import BeautifulSoup
 import utils
+import socket
 from counter import Counter
 
 class ParseError(Exception):
@@ -37,21 +38,32 @@ class ParseError(Exception):
 class InvalidPageError(Exception):
     pass
 
+class TimeoutError(Exception):
+    pass
+
 class Page:
     def __init__(self, url):
         self.links = []
         self.word_counts = Counter()
         self.url = self.standardize_url(url)
         self.title = ''
+        self.parsed = False
+        self.timeouts = 0
+
+    def parse(self):
         try:
             self.parse_page()
+            self.parsed = True
         except ParseError, e:
             raise InvalidPageError(str(e))
         except httplib2.HttpLib2Error as e:
             raise InvalidPageError(str(e))
+        except socket.timeout:
+            self.timeouts += 1
+            raise TimeoutError('%s timed out.' % self.url)
 
     def parse_page(self):
-        h = httplib2.Http('.cache')
+        h = httplib2.Http('.cache', timeout=5) # timeout in seconds
         resp, page = h.request(self.url, 'GET')
         strainer = BeautifulSoup.SoupStrainer({'a': True, 'title': True, 'body': True, 'script': True})
         try:
@@ -142,12 +154,7 @@ class Crawler:
     def __init__(self,start_page,rest=1000,
                     depth=5):
         
-        try:
-            self.pages_to_visit = [(Page(start_page),0)]  # queue for pages to load
-        except InvalidPageError, e:
-            print 'InvalidPageError', e
-            self.pages_to_visit = []
-
+        self.pages_to_visit = [(Page(start_page),0)]  # queue for pages to load
         # time in ms to wait between pageloads
         self.rest = rest
         self.database = []
@@ -157,20 +164,33 @@ class Crawler:
     def crawl(self):
         
         while len(self.pages_to_visit) > 0:
-            time.sleep(self.rest/1000.0)
             current_page,distance_from_start = self.pages_to_visit.pop(0)
             if current_page in self.database or distance_from_start > self.depth:
                 continue #to next page on the list
+            sleep_time = (self.rest/1000.0) + 2**current_page.timeouts
+            time.sleep(sleep_time)
             print "checking out page",current_page.url
+
+            try:
+                if not(current_page.parsed):
+                    current_page.parse()
+            except InvalidPageError, e:
+                print 'InvalidPageError', e
+                continue # to next page on the list
+            except TimeoutError as e:
+                print 'TimeoutError', e
+                if current_page.timeouts > 3:
+                    continue
+                self.pages_to_visit.append((current_page, distance_from_start))
 
             self.database.append(current_page)
             
             for url in current_page.links:
-                try:
-                    self.pages_to_visit.append((Page(url),distance_from_start+1))
-                except InvalidPageError, e:
-                    print 'InvalidPageError', e
-                    current_page.links.remove(url)
+                #try:
+                self.pages_to_visit.append((Page(url),distance_from_start+1))
+                #except InvalidPageError, e:
+                #    print 'InvalidPageError', e
+                #    current_page.links.remove(url)
 
             yield current_page
 
