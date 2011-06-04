@@ -22,7 +22,7 @@ implement a constraint so it won't explore outside of its nth parent.
 
 '''
 
-import urllib2
+import httplib2
 import urlparse
 import posixpath
 import time
@@ -45,14 +45,14 @@ class Page:
         self.title = ''
         try:
             self.parse_page()
-        except urllib2.URLError, e:
-            e = self.url + ' ' + str(e)
-            raise InvalidPageError(e)
         except ParseError, e:
+            raise InvalidPageError(str(e))
+        except httplib2.HttpLib2Error as e:
             raise InvalidPageError(str(e))
 
     def parse_page(self):
-        page = urllib2.urlopen(self.url)
+        h = httplib2.Http('.cache')
+        resp, page = h.request(self.url, 'GET')
         strainer = BeautifulSoup.SoupStrainer({'a': True, 'title': True, 'body': True, 'script': True})
         try:
             soup = BeautifulSoup.BeautifulSoup(page, parseOnlyThese=strainer) # what if it fails to parse?

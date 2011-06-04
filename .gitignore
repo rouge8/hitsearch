@@ -26,3 +26,4 @@ Icon?
 ### Python Dependencies
 django
 django-admin.py
+httplib2
