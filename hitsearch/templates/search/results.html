@@ -3,11 +3,12 @@
 {% block main %}
 <h1>HITSearch</h1>
 <form method="get" action="/">
-    <input type="text" name="q">
+    <input type="text" name="q" value="{{ q }}">
     <button type="submit">Search</button>
 </form>
 
-asdfasfss
+{{ links }}
+
 {% if results %}
 <h2>Results</h2>
 

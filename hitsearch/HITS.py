@@ -1,6 +1,16 @@
 def initialize_authority(pages):
     return dict(zip(pages.keys(), [1]*len(pages)))
 
+def clean_pages(pages):
+    for page in pages:
+        outside_links = []
+        for i in range(len(pages[page])):
+            if pages[page][i] not in pages or pages[page][i] == page: outside_links.append(i)
+        outside_links.reverse()
+        for outside_link in outside_links:
+            pages[page].pop(outside_link)
+    return pages
+                
 def initialize_L_matrices(pages):
     L_matrix = pages
     Lt_matrix = {}
@@ -24,6 +34,8 @@ def normalize(vector):
     for component in vector:
         if vector[component] > max:
             max = vector[component]
+    if max == 0:
+        return vector
     for component in vector:
         vector[component] = float(vector[component]) / max
     return vector
@@ -36,20 +48,22 @@ def vector_difference(vector1, vector2):
     return total        
 
 def HITS(pages):
+    pages = clean_pages(pages)
     authority_old = None
     authority = initialize_authority(pages)
     (L_matrix, Lt_matrix) = initialize_L_matrices(pages)
-    while vector_difference(authority_old, authority) > 0:
+    while vector_difference(authority_old, authority) > 0.01:
+        print vector_difference(authority_old, authority)
         authority_old = authority
         hubbiness = normalize(multiply_matrix_vector(L_matrix, authority))
         authority = normalize(multiply_matrix_vector(Lt_matrix, hubbiness))
     return authority, hubbiness
 
 def main():
-    pages = {"a":["b", "c"], "b":["c"], "c":["b", "e"], "d":["b"], "e":["c"]}
+    pages = {"a":["b", "c"], "b":["f"], "c":["b", "e"], "d":["b"], "e":["c"]}
     (authority, hubbiness) = HITS(pages)
-    print authority
-    print hubbiness
+    print "Authority: " + str(authority)
+    print "Hubbiness: " + str(hubbiness)
 
 if __name__ == "__main__":
     main()
