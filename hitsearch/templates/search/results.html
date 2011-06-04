@@ -1,26 +1,23 @@
 {% extends "search/base.html" %}
 
 {% block main %}
-<h1>HITSearch</h1>
+<div class="search-form">
+
 <form method="get" action="/">
-    <input type="text" name="q" value="{{ q }}">
+    <input type="text" name="q" value="{{ q }}" autofocus>
     <button type="submit">Search</button>
 </form>
 
-{{ links }}
+</div>
 
-{% if results %}
-<h2>Results</h2>
-
-{% for result in results %}
+<div id="results">
+{% if results %}{% for result in results %}
 <div class="result">
-    <h3>{{ forloop.counter }}. <a href="{{ result.url }}">{{ result.title }}</a></h3>
+    <h3>{{ forloop.counter }}. <a href="{{ result.url }}">{{ result.title|safe }}</a></h3>
     <p>authority: {{ result.authority }} | hubbiness: {{ result.hubbiness }}</p>
 </div>
-{% endfor %}
+{% endfor %}{% else %}
+Sorry, no results{% endif %}
+</div>
 
-{% else %}
-Sorry, no results
-
-{% endif %}
 {% endblock %}
