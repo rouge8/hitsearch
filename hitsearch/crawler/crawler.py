@@ -48,7 +48,10 @@ class Page:
     def parse_page(self):
         page = urllib2.urlopen(self.url)
         strainer = BeautifulSoup.SoupStrainer({'a': True, 'title': True, 'body': True, 'script': True})
-        soup = BeautifulSoup.BeautifulSoup(page, parseOnlyThese=strainer) # what if it fails to parse?
+        try:
+            soup = BeautifulSoup.BeautifulSoup(page, parseOnlyThese=strainer) # what if it fails to parse?
+        except UnicodeEncodeError, e:
+            raise ParseError('%s is not HTML.' % self.url)
         links = soup('a')
         self.get_links(links)
         try:
