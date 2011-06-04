@@ -1,15 +1,7 @@
-Come up with better way to organize TODO system
-    Tickets/issues?  could we use github?
-PARTS:
-    WebCrawler: able to learn the organization and structure of an internet
-        - pull out links to other pages
-        - generate keywords for pages for searching
-        - save work:
-            - in such a way that allows us to not need to crawl more than we have to
-            _ maybe be able to have inexpensive 'just-update-whats-new' crawls
-    HITS algorithm:  take data from webcrawler, generate rankings of pages
-    Query parser: take user input, figure out how to query the engine
-    Search Engine: take a query, get a list of relevant pages, and rank them with the (pre-computed) HITS ranks
-    Views:  probably just make it a textfield with a button, etc etc.
-
-    It'd be cool if we could design this in a way that Carleton or other sites could easily adopt it for their own use, but eh-- whatever
+QUERY:
+    stop words in query:
+        solution!
+            remove stop words
+        if the query is then empty, put them all back in
+            (or put them back in in order of descending stoppiness?)
+        say which words were ignored
