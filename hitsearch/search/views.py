@@ -4,6 +4,7 @@ import HITS
 
 def index(request):
     q = request.GET.get('q')
+    s = request.GET.get('s')
     query = q
     if q:
         q = q.split(' ')
@@ -22,12 +23,15 @@ def index(request):
                 page.authority = authority[page.url]
                 page.hubbiness = hubbiness[page.url]
             
-            results = sorted(pages, cmp=lambda x,y: cmp(x.authority, y.authority), reverse=True)
-
+            print s
+            if s == 'h':
+                results = sorted(pages, key=lambda page: (page.hubbiness, page.authority), reverse=True)
+            else:
+                results = sorted(pages, key=lambda page: (page.authority, page.hubbiness), reverse=True)
         else:
             results = []
         
-        return render_to_response('search/results.html', { 'q': query, 'results': results })
+        return render_to_response('search/results.html', { 'q': query, 's': s, 'results': results })
     else:
         return render_to_response('search/index.html', { })
     

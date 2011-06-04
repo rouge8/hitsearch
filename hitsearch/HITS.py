@@ -53,7 +53,6 @@ def HITS(pages):
     authority = initialize_authority(pages)
     (L_matrix, Lt_matrix) = initialize_L_matrices(pages)
     while vector_difference(authority_old, authority) > 0.1:
-        print vector_difference(authority_old, authority)
         authority_old = authority
         hubbiness = normalize(multiply_matrix_vector(L_matrix, authority))
         authority = normalize(multiply_matrix_vector(Lt_matrix, hubbiness))
