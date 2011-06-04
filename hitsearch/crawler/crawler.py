@@ -104,7 +104,7 @@ class Page:
     
         parsed = urlparse.urlparse(url)
         new_path = posixpath.normpath(parsed.path)
-        if parsed.path.endswith('/'):
+        if parsed.path.endswith('/') and new_path[-1] != '/':
             # Compensate for issue1707768
             new_path += '/'
         cleaned = parsed._replace(path=new_path)
