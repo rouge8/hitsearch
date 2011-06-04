@@ -17,8 +17,9 @@
 
 <div id="results">
 {% if results %}{% for result in results %}
-<div class="result" onclick="window.location='{{ result.url }}'">
+<div class="result">
     <h3>{{ forloop.counter }}. <a href="{{ result.url }}">{{ result.title|safe }}</a></h3>
+    <p><a href="{{ result.url }}">{{ result.url }}</a></p>
     <p>authority: {{ result.authority|floatformat:5 }} | hubbiness: {{ result.hubbiness|floatformat:5 }}</p>
 </div>
 {% endfor %}{% else %}
