@@ -6,7 +6,7 @@ def get_results(query, sort_type='a'): # default sort type is authority
     terms = query.split()
     terms = [utils.sanitize(term).lower() for term in terms]
     
-    pages = Page.objects
+    pages = Page.objects.select_related('tag__word_count')
 
     for term in terms:
         pages = pages.filter(tag__tag=term)
@@ -22,10 +22,21 @@ def get_results(query, sort_type='a'): # default sort type is authority
         # run HITS
         (authority, hubbiness) = HITS.HITS(links)
 
-        # assign the pages hubbiness and authority
+        # give a boost based on word frequency
+        tags_query = Tag.objects.filter(page__in=pages).values_list('page__url', 'word_count', 'tag')
+        
+        tags = dict([(page.url, [0, 0]) for page in pages])
+        for tag in tags_query:
+            if tag[2] in terms:
+                tags[tag[0]][0] += tag[1]
+            tags[tag[0]][1] += tag[1]
+
+        beta = .8
+        
+        # assign the pages hubbiness and authority     
         for page in pages:
-            page.authority = authority[page.url]
-            page.hubbiness = hubbiness[page.url]
+            page.authority = beta * authority[page.url] + (1 - beta) * tags[page.url][0] / float(tags[page.url][1])
+            page.hubbiness = beta * hubbiness[page.url] + (1 - beta) * tags[page.url][0] / float(tags[page.url][1])
 
         # sort the pages
         if sort_type == 'h': # hubbiness
