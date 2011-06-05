@@ -6,8 +6,8 @@ import query
 def index(request):
     q = request.GET.get('q')
     s = request.GET.get('s')
-    if s == 'h': s == 'hubbiness'
-    else: s == 'authority'
+    if s == 'h': s = 'hubbiness'
+    else: s = 'authority'
 
     if q:
         results = query.get_results(q, s)
