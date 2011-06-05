@@ -13,9 +13,6 @@ def index(request):
     except Exception:
         b = .7
 
-    print b
-    print float(b)
-
     if q:
         results = query.get_results(q, "authority" if s == "a" else "hubbiness", b)
         return render_to_response('search/results.html', { 'q': q, 's': s, 'b': b, 'results': results })
