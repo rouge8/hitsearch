@@ -4,13 +4,12 @@ Google uses PageRank.  HITS is just like PageRank, except it figures out how to 
 
 This engine is based off the Django framework.  Fortunately we've included the exact version you need in with the repository so you don't need to download it on your own.  Is that violating some copyright laws? Let's hope not.
 
-# How to Run
+# How to Use
 
-1. Unpack the dependencies by running `./setup-dependencies.sh`.
-2. To run the development server and host it locally for testing. `./syncdb` to setup the database
-3. `./runserver` to run the development server
-4. .. populate your database, run the webcrawler
-5. try a test search! 
+Go to the `hitsearch` directory in your terminal and run `./install`.  This will setup all the dependencies and setup the database.  Also,you will be asked to create an administrator account for the database.
+
+Now you can run the server with the command `./runserver`, or populate the database with pages by running `./crawl <url>`.
+
 
 # Cleanup
 
