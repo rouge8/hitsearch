@@ -3,7 +3,7 @@ from django.db import transaction
 from hitsearch.crawler import Crawler
 from hitsearch.search.models import *
 from datetime import datetime
-from collections import Counter
+from counter import Counter
 
 class Command(BaseCommand):
     args = '<start_site depth>'
