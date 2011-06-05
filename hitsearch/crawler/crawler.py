@@ -154,9 +154,12 @@ class CrawlerWorker(threading.Thread):
         threading.Thread.__init__(self)
         self.parent = parent
     def run(self):
+        print "thread started"
+        print self.pages_to_visit
         while len(self.pages_to_visit) > 0:
             current_page,distance_from_start = self.pages_to_visit_pop()
             if current_page in self.database or distance_from_start > self.depth:
+                print "skipping",current_page
                 continue #to next page on the list
             sleep_time = (self.rest/1000.0) + 2**current_page.timeouts
             time.sleep(sleep_time)
@@ -177,9 +180,10 @@ class CrawlerWorker(threading.Thread):
             self.add_page_to_database(current_page)
             
             for url in current_page.links:
-                self.add_page_to_database((Page(url),distance_from_start+1))
+                self.add_page_to_pages_to_visit((Page(url), distance_from_start))
 
             self.add_page_to_out_queue(current_page)
+        print "Thread exit",self
 
     def add_page_to_out_queue(self,page):
         self.parent.out_queue_lock.acquire()
@@ -210,13 +214,13 @@ class CrawlerWorker(threading.Thread):
     def pages_to_visit_pop(self):
         self.parent.pages_to_visit_lock.acquire()
         page_to_vist = self.parent.pages_to_visit.pop(0)
-        self.parent.pages_to_visit._lockrelease()
+        self.parent.pages_to_visit_lock.release()
         return page_to_vist
         
     def add_page_to_pages_to_visit(self,page):
         self.parent.pages_to_visit_lock.acquire()
         self.parent.pages_to_visit.append(page)
-        self.parent.pages_to_visit._lockrelease()
+        self.parent.pages_to_visit_lock.release()
         
 
 class Crawler:
@@ -241,7 +245,6 @@ class Crawler:
         # Thread-shared data structures
         self.out_queue = []
         self.database = []
-        self.pages_to_visit = []
 
         # Locks for shared data structures
         self.out_queue_lock = threading.Lock()
@@ -250,6 +253,7 @@ class Crawler:
 
     def crawl(self):
         self.worker_thread.start()
+        time.sleep(5)
         while True:
             if len(self.out_queue) == 0 and not self.worker_thread.is_alive():
                 raise StopIteration
@@ -260,3 +264,36 @@ class Crawler:
             page = self.out_queue.pop(0)
             self.out_queue_lock.release()
             yield page
+
+def main():
+    start_site = "http://people.carleton.edu/~deanc/testsite/a.html"
+    depth = None
+
+    if depth:
+        spider = Crawler(start_site,depth=int(depth), rest=250)
+    else:
+        spider = Crawler(start_site, rest=250)
+
+    print 'starting crawl'
+    
+    datas = []
+    for page in spider.crawl(): # database is a list of hitsearch.crawler.Page() objects
+        print "NEW PAGE"
+        print page.url
+        datas.append(page)
+
+        # save links!
+        print "save links"
+        for link in page.links:
+            print "\t",
+            print link
+            
+        # save word counts!
+        print "save words"
+        for word in page.word_counts.keys():
+            print "\t",
+            print word
+    print len(datas), "pages found"
+
+if __name__ == '__main__':
+    main()
