@@ -239,9 +239,9 @@ class Crawler:
 
 
         # Thread-shared data structures
-        self.out_queue_lock = threading.Lock()
-        self.database_lock= threading.Lock()
-        self.pages_to_visit_lock= threading.Lock()
+        self.out_queue = []
+        self.database = []
+        self.pages_to_visit = []
 
         # Locks for shared data structures
         self.out_queue_lock = threading.Lock()
@@ -254,7 +254,7 @@ class Crawler:
             if len(self.out_queue) == 0 and not self.worker_thread.is_alive():
                 raise StopIteration
             if len(self.out_queue) == 0:
-                sleep(.05)
+                time.sleep(.05)
                 continue
             self.out_queue_lock.acquire()
             page = self.out_queue.pop(0)
