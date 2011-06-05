@@ -6,8 +6,15 @@ def index(request):
     q = request.GET.get('q') # the query terms
     s = request.GET.get('s') # sort type: a - authority, h - hubbiness
     b = request.GET.get('b') # beta: weigting between word frequency and authority/hubbiness
-    if type(b) != type(1.0) or beta < 0 or beta > 1:
+
+    try:
+        b = float(b)
+        if b > 1.0 or b < 0.0: b = 0.7
+    except Exception:
         b = .7
+
+    print b
+    print float(b)
 
     if q:
         results = query.get_results(q, "authority" if s == "a" else "hubbiness", b)
