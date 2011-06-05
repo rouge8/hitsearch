@@ -2,7 +2,7 @@ from search.models import *
 import HITS
 import utils
 
-def get_results(query, sort_type='a'): # default sort type is authority
+def get_results(query, sort_type, beta):
     terms = query.split()
     terms = [utils.sanitize(term).lower() for term in terms]
     
@@ -30,8 +30,6 @@ def get_results(query, sort_type='a'): # default sort type is authority
             if tag[2] in terms:
                 tags[tag[0]][0] += tag[1]
             tags[tag[0]][1] += tag[1]
-
-        beta = .8
         
         # assign the pages hubbiness and authority     
         for page in pages:
@@ -39,7 +37,7 @@ def get_results(query, sort_type='a'): # default sort type is authority
             page.hubbiness = beta * hubbiness[page.url] + (1 - beta) * tags[page.url][0] / float(tags[page.url][1])
 
         # sort the pages
-        if sort_type == 'h': # hubbiness
+        if sort_type == 'hubbiness': # hubbiness
             sorter = lambda page: (page.hubbiness, page.authority)
         else:
             sorter = lambda page: (page.authority, page.hubbiness)
