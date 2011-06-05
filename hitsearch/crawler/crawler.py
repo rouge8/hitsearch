@@ -252,7 +252,6 @@ class Crawler:
 
     def crawl(self):
         self.worker_thread.start()
-        time.sleep(5)
         while True:
             if len(self.out_queue) == 0 and not self.worker_thread.is_alive():
                 raise StopIteration
