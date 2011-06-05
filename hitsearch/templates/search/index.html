@@ -7,6 +7,8 @@
     <input type="text" name="q" id="q" autofocus>
     <button type="submit">Search</button><br>
     <div style="margin-top: 1em;">
+    <strong>beta:</strong>
+    <input type="text" name="b" id="b" value=".7">
     <strong>sort by:</strong>
     <input type="radio" name="s" value="a"{% if s != 'h' %} checked{% endif %}> <label for="s">authority</label> |
     <input type="radio" name="s" value="h"{% if s == 'h' %}checked{% endif %}> <label for="s">hubbiness</label>
