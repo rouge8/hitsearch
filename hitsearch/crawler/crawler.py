@@ -154,8 +154,7 @@ class CrawlerWorker(threading.Thread):
         threading.Thread.__init__(self)
         self.parent = parent
     def run(self):
-        print "thread started"
-        print self.pages_to_visit
+        print "thread started",self
         while len(self.pages_to_visit) > 0:
             current_page,distance_from_start = self.pages_to_visit_pop()
             if current_page in self.database or distance_from_start > self.depth:
