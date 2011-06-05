@@ -31,6 +31,7 @@ import BeautifulSoup
 import utils
 import socket
 from counter import Counter
+from collections import defaultdict
 import threading
 
 class ParseError(Exception):
@@ -43,9 +44,9 @@ class TimeoutError(Exception):
     pass
 
 class Page:
-    def __init__(self, url):
-        self.links = []
-        self.word_counts = Counter()
+    def __init__(self, url, word_counts=[]):
+        self.links = defaultdict(list)
+        self.word_counts = Counter(word_counts)
         self.url = self.standardize_url(url)
         self.title = ''
         self.parsed = False
@@ -87,7 +88,13 @@ class Page:
                 target = urlparse.urljoin(self.url, target) # translate link to proper url
                 target = self.standardize_url(target) # standardize url
                 if self.is_valid_link(target):
-                    self.links.append(target)
+                    # get link text
+                    words = link.findAll(text=True)
+                    words = ' '.join(words).split()
+                    link_words = [utils.sanitize(word).lower() for word in words if len(word) != 0]
+                    # links are now dictionaries of url: list_of_words
+                    self.links[target].extend(link_words)
+
 
     def get_content(self, soup):
         # based on http://groups.google.com/group/beautifulsoup/browse_thread/thread/9f6278ee2a2e4564
@@ -106,7 +113,7 @@ class Page:
         if len(self.title) == 0: self.title = self.url
         words = ' '.join(body).split() + ' '.join(title).split()
         words = [utils.sanitize(word).lower() for word in words if len(word) != 0]
-        self.word_counts = Counter(words) 
+        self.word_counts += Counter(words) 
 
     def __eq__(self,y):
         if type(y) is str or type(y) is unicode:
@@ -179,7 +186,8 @@ class CrawlerWorker(threading.Thread):
             self.add_page_to_database(current_page)
             
             for url in current_page.links:
-                self.add_page_to_pages_to_visit((Page(url), distance_from_start))
+                word_counts = current_page.links[url]
+                self.add_page_to_pages_to_visit((Page(url, word_counts), distance_from_start))
 
             self.add_page_to_out_queue(current_page)
         print "Thread exit",self

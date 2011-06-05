@@ -3,6 +3,7 @@ from django.db import transaction
 from hitsearch.crawler import Crawler
 from hitsearch.search.models import *
 from datetime import datetime
+from collections import Counter
 
 class Command(BaseCommand):
     args = '<start_site depth>'
@@ -25,6 +26,13 @@ class Command(BaseCommand):
             page_object.title = page.title
             page_object.save()
 
+            # save word counts!
+            for word in page.word_counts.keys():
+                word_object, created = Tag.objects.get_or_create(page=page_object,
+                    tag=word)
+                word_object.word_count = page.word_counts[word]
+                word_object.save()
+
             # save links!
             for link in page.links:
                 target_object,created = Page.objects.get_or_create(url=link)
@@ -32,13 +40,15 @@ class Command(BaseCommand):
                 link_object,created = Link.objects.get_or_create(target=target_object, source=page_object)  # should make .links return text too
                 link_object.save()
                 
-            # save word counts!
-            for word in page.word_counts.keys():
-                word_object, created = Tag.objects.get_or_create(page=page_object,
-                    tag=word)
-                word_object.word_count = page.word_counts[word]
-                word_object.save()
+                # save word counts
+                word_counts = Counter(page.links[link])
+                for word,count in word_counts.iteritems():
+                    word_object, created = Tag.objects.get_or_create(page=target_object,
+                        tag=word)
+                    if created:
+                        word_object.word_count = count 
+                    else:
+                        word_object.word_count += count
+                    word_object.save()
+                
             transaction.commit()
-
-#### THIS IS THE GENERAL IDEA ANYWAY....
-#### from https://docs.djangoproject.com/en/1.3/howto/custom-management-commands/

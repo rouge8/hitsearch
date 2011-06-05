@@ -6,6 +6,3 @@ QUERY:
             (or put them back in in order of descending stoppiness?)
         say which words were ignored
 
-CRAWLER:
-    include link text in word_counts, even of pages that are never parsed
-    this means they will actually be able to show up in our results, even if it is unlikely

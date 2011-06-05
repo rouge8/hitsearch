@@ -14,7 +14,6 @@ class Page(models.Model):
 class Link(models.Model):
     target = models.ForeignKey(Page, related_name='link_target', db_index=True)
     source = models.ForeignKey(Page, related_name='link_source', db_index=True)
-    #text = models.TextField(blank=True, null=True)
 
     class Meta:
         unique_together = ('target', 'source')
