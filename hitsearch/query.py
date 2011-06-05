@@ -48,3 +48,8 @@ def get_results(query, sort_type, beta):
         results = []
 
     return results
+
+if __name__ == '__main__':
+    q = 'carleton college'
+    authority = get_results(q, 'authority')
+    hubbiness = get_results(q, 'hubbiness')
