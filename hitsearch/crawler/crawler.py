@@ -65,8 +65,11 @@ class Page:
             raise TimeoutError('%s timed out.' % self.url)
 
     def parse_page(self):
-        h = httplib2.Http('.cache', timeout=5) # timeout in seconds
-        resp, page = h.request(self.url, 'GET')
+        try:
+            h = httplib2.Http('.cache', timeout=5) # timeout in seconds
+            resp, page = h.request(self.url, 'GET')
+        except AttributeError:
+            raise httplib2.HttpLib2Error('could not open a socket for %s.' %self.url)
         strainer = BeautifulSoup.SoupStrainer({'a': True, 'title': True, 'body': True, 'script': True})
         try:
             soup = BeautifulSoup.BeautifulSoup(page, parseOnlyThese=strainer) # what if it fails to parse?
