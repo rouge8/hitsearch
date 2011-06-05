@@ -6,7 +6,7 @@ def get_results(query, sort_type='a'): # default sort type is authority
     terms = query.split()
     terms = [utils.sanitize(term).lower() for term in terms]
     
-    pages = Page.objects.select_related() # this may be super fast?
+    pages = Page.objects
 
     for term in terms:
         pages = pages.filter(tag__tag=term)
