@@ -25,9 +25,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         start_site = args[0]
         if len(args) > 1: depth = args[1]
-        else: depth = None
+        else: depth = -1
 
-        if depth:
+        if depth != -1:
             spider = Crawler(start_site,depth=int(depth), rest=250)
         else:
             spider = Crawler(start_site, rest=250)
