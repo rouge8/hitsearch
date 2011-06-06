@@ -157,7 +157,15 @@ class Page:
             return url
 
     def is_valid_link(self,url):
-        return True
+        # just a few cases
+        if url.startswith('mailto:') or url.startswith('javascript:'):
+            return False
+        elif url.startswith('webcal:') or url.startswith('callto:'):
+            return False
+        elif url.endswith('textonly=1'):
+            return False
+        else:
+            return True
 
 class CrawlerWorker(threading.Thread):
 
