@@ -41,7 +41,7 @@ class Page:
         self.url = self.standardize_url(url)
         self.title = ''
         self.parsed = False
-        self.url_depth = url_depth ## CONRAD EXPLAIN THIS
+        self.url_depth = url_depth  # controls allowable URLS to crawl. -1: same domain, 0: everything, 1: same dir, 2: parent dir of current dir, etc
         self.timeouts = 0 # number of times page has timed out
 
     def parse(self):
@@ -283,8 +283,11 @@ class CrawlerWorker(threading.Thread):
 
 class Crawler:
     """Crawler object crawls web pages. Has parameters start_page=url, rest=milliseconds,
-       url_depth=MAGIC FOR CONRAD, and depth=depth of crawler. Uses threads and
-       lots of RAM."""
+       url_depth=integer{-1: restrict to URLs of same domain name,
+       0: allow all URLS,
+       1: stay in same directory as source URL,
+       2: stay within parent directory of the directory you're currently in, etc...},
+       and depth=depth of crawler, number of links away from start_page allowed. """
 
     def __init__(self,
                 start_page,
