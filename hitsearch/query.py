@@ -17,7 +17,9 @@ def get_results(query, sort_type, beta):
         
         # now build the links dict to pass into HITS
         links = dict([(page.url, []) for page in pages])
-        [links[link[0]].append(link[1]) for link in links_query]
+        for link in links_query:
+            links[link[0]].append(link[1])
+        #[links[link[0]].append(link[1]) for link in links_query]
 
         # run HITS
         (authority, hubbiness) = HITS.HITS(links)

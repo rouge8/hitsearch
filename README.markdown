@@ -18,6 +18,8 @@ Once the server is running, point your browser to <http://localhost:8000> and se
 
 Want to play around like an admin? Go to <http://localhost:8000/admin/>. EXPLAIN WHAT CAN BE DONE
 
+EXPLAIN FEATURES ON SEARCH PAGE SPECIFICALLY BETA
+
 # Cleanup
 
 Dependencies can be removed with `remove-dependencies.sh`.
