@@ -4,23 +4,12 @@
 # Explores the Internet so you don't have to!
 
 """
-The web crawler should be able to move around the internet at a nice, leisurely pace collecting things about web pages.
-It should collect links to other pages, and it should collect wordcounts of a page, because collecting the entire page would take up quite a bit of space-- maybe we can just get away with word counts?
+The crawler moves around the internet at a nice leisurely pace, as specified by its "rest" argument, the time it waits between pages.  Additionally, if a web page is unresponsive, it will wait for a factor of rest*(2^n), where n is the number of timeouts that have happened before.
 
-Also, it should keep a record of previously explored pages so it doesn't do anything redundant
+There are two parts to the crawler, Page objects, and the Crawler class.  Page objects do most of the grunt work with parsing the html found at a given URL and returning a list of new URL's back to the Crawler.  The Crawler itself coordinates which pages to load and collects the relevant ones for saving to the database.
+
+The Crawler's crawl() method is an iterator that returns pages it finds.  It acts like a thread-safe buffer, letting the database pull pages out of it even while the Crawler is waiting for a page to load.  This lets us have the overhead from the database and the internet overlap letting us consume web pages more efficently.
 """
-
-#TODO
-'''
-implement a constraint so it won't explore outside of its nth parent.
-    example: carleton.edu/cs/comps/
-    parent = 0 -> explores carleton.edu/cs/comps/*
-    parent = 1 -> explores carleton.edu/cs/*
-    parent = 2 -> explores carleton.edu/*
-    parent = 3 -> explores *
-    parent = -1 -> explores *
-
-'''
 
 import httplib2
 import urlparse
@@ -172,9 +161,9 @@ class Page:
         if depth > url.count("/")-3:
             return self.proper_prefix(url,-1) # if you accidently exceed, just stay in domain
         if depth == -1:
-            return urlparse.urljoin(url,"/")
+            return urlparse.urljoin(url,"/")  # returns just the domain
         if depth == 0:
-            return ""
+            return ""  # will match anything
         if depth > 0:
             for i in range(depth):
                 url = url.rstrip("/")
@@ -200,6 +189,9 @@ class Page:
             return True
 
 class CrawlerWorker(threading.Thread):
+    '''This a worker thread for the Crawler.
+    It lets you continue to explore the internet without needing to wait
+    for the database to finish saving a page'''
 
     def __init__(self,parent):
         threading.Thread.__init__(self)
@@ -342,10 +334,12 @@ class Crawler:
             self.crawl_died.set() # when threads see this they'll quit too 
 
 def main():
+    ''' crawler test'''
+    start_site = "http://cs.carleton.edu/cs_comps/1011/robot_tour_guide/index.php"
     start_site = "http://people.carleton.edu/~deanc/testsite/deep/1.html"
     start_site = "http://people.carleton.edu/~deanc/testsite/a.html"
-    start_site = "http://cs.carleton.edu/cs_comps/1011/robot_tour_guide/index.php"
     #start_site = "http://people.carleton.edu/~deanc/testsite/connected/"
+
     depth = 600
     url_depth = 2 
 
