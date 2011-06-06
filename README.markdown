@@ -18,7 +18,7 @@ Once the server is running, point your browser to <http://localhost:8000> and se
 
 Want to play around like an admin? Go to <http://localhost:8000/admin/>. The username and password on our massive sample database are both 'admin'. From the admin page you can delete and edit objects as well as search them. It's easier and faster for searching than mucking around in the shell.
 
-EXPLAIN FEATURES ON SEARCH PAGE SPECIFICALLY BETA
+Our search page has a few options that are not found on your typical search engine. We let you sort pages by authority or hubbiness, and we have a beta value. beta can range from 0.0 to 1.0 and it determines how much HITS results will be weighted versus term frequency of your search term, where beta=1.0 is 100% HITS, 0% TF and beta=0.0 is 0% HITS, 100% TF.
 
 # Cleanup
 
