@@ -73,3 +73,4 @@ Our search application!
 - static/ contains our static files. Our CSS is done in [LESS](http://lesscss.org/), which has all of the things CSS can do plus so much more.
 - tests.py is a test suite. WE NEED TO USE THIS OR GET RID OF IT
 - views.py contains the views of our application. documented more in the file.
+- management/commands/crawl.py is what links our crawler to our database and lets us run the crawler with manage.py crawl. documented more in file
