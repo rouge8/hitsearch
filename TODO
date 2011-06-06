@@ -13,8 +13,15 @@ ADMINPAGE:
         status..
             maybe make it write to a logfile?
 CRAWLER:
-    parallel crawling
+    PARALLEL CRAWLING
         threads should actually wait till all other threads are waiting, then they all die at once
             ###right now a thread crawls until the pages_to_visit queue is empty, and then it'll quit.
             ###this means as soon as the queue is empty, but pages are still downloading stuff, all of the threads but the active ones will die
         in the wait state, they should wake up when anything gets put in the queue
+    URL_DEPTH
+        currently able to limit pages to the site/folder the crawler started from
+            BUG
+                because its based on counting the '/' character, it's possible that it can get messed up.  use urlparse to get better control
+            BUG
+                url_depth is passed down to each page.  Is it possible that as the pages get further from the source, the prefix that url_depth creates actually changes?
+                example: I'm in a.com/b/c/d/e.html.  i'm allowed to go to depth2, so that's a.com/b/c/*.  I go to a.com/b/c/index.html, but now on this page my url_depth is still set to 2.  Does that mean that from this new page i'm allowed to go as far as a.com/b/* now??

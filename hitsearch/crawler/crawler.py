@@ -44,12 +44,13 @@ class TimeoutError(Exception):
     pass
 
 class Page:
-    def __init__(self, url, word_counts=[]):
+    def __init__(self, url, url_depth, word_counts=[]):
         self.links = defaultdict(list)
         self.word_counts = Counter(word_counts)
         self.url = self.standardize_url(url)
         self.title = ''
         self.parsed = False
+        self.url_depth = url_depth
         self.timeouts = 0
 
     def parse(self):
@@ -156,8 +157,32 @@ class Page:
         else:
             return url
 
+    def proper_prefix(self,url,depth):
+        # -1: stay on domain
+        #  0: go anywhere
+        #  1: stay in folder
+        #  2: go one outside folder
+        if depth > url.count("/")-3:
+            return self.proper_prefix(url,-1) # if you accidently exceed, just stay in domain
+        if depth == -1:
+            return urlparse.urljoin(url,"/")
+        if depth == 0:
+            return ""
+        if depth > 0:
+            for i in range(depth):
+                url = url.rstrip("/")
+                slash = url.rfind("/") +1
+                url = url[:slash]
+            return url
+
+    def correct_parent(self,site,next_site):
+        pre = self.proper_prefix(site,self.url_depth)
+        return next_site.startswith(pre)
+
     def is_valid_link(self,url):
         # just a few cases
+        if not self.correct_parent(self.url,url):
+            return False
         if url.startswith('mailto:') or url.startswith('javascript:'):
             return False
         elif url.startswith('webcal:') or url.startswith('callto:'):
@@ -180,7 +205,7 @@ class CrawlerWorker(threading.Thread):
                 break # kill this thread
             current_page,distance_from_start = self.pages_to_visit_pop()
             if current_page.url in self.database or distance_from_start > self.depth:
-                print "skipping",current_page
+                print "skipping",current_page.url
                 continue #to next page on the list
             sleep_time = (self.rest/1000.0) + 2**current_page.timeouts
             time.sleep(sleep_time)
@@ -202,7 +227,7 @@ class CrawlerWorker(threading.Thread):
             
             for url in current_page.links:
                 word_counts = current_page.links[url]
-                self.add_page_to_pages_to_visit((Page(url, word_counts), distance_from_start+1))
+                self.add_page_to_pages_to_visit((Page(url, self.url_depth, word_counts=word_counts), distance_from_start+1))
 
             self.add_page_to_out_queue(current_page)
         print "Thread exit",self
@@ -211,6 +236,10 @@ class CrawlerWorker(threading.Thread):
         self.parent.out_queue_lock.acquire()
         self.parent.out_queue.append(page)
         self.parent.out_queue_lock.release()
+
+    @property
+    def url_depth(self):
+        return self.parent.url_depth
 
     @property
     def rest(self):
@@ -258,11 +287,13 @@ class Crawler:
     def __init__(self,
                 start_page,
                 rest=1000,
+                url_depth=0,
                 depth=5):
         
         # time in ms to wait between pageloads
         self.rest = rest
         self.depth = depth if depth > 0 else float("inf") # distance allowed from start page
+        self.url_depth = url_depth
 
         self.worker_threads = []
         self.worker_threads.append(CrawlerWorker(self))
@@ -272,7 +303,7 @@ class Crawler:
         # Thread-shared data structures
         self.out_queue = []
         self.database = []
-        self.pages_to_visit = [(Page(start_page),1)]  # queue for pages to load
+        self.pages_to_visit = [(Page(start_page,self.url_depth),1)]  # queue for pages to load
 
         # Locks for shared data structures
         self.out_queue_lock = threading.Lock()
@@ -303,20 +334,22 @@ class Crawler:
 def main():
     start_site = "http://people.carleton.edu/~deanc/testsite/deep/1.html"
     start_site = "http://people.carleton.edu/~deanc/testsite/a.html"
+    start_site = "http://cs.carleton.edu/cs_comps/1011/robot_tour_guide/index.php"
     #start_site = "http://people.carleton.edu/~deanc/testsite/connected/"
     depth = 600
+    url_depth = 2 
 
     if depth:
-        spider = Crawler(start_site,depth=int(depth), rest=250)
+        spider = Crawler(start_site,depth=int(depth),url_depth=url_depth, rest=0)
     else:
-        spider = Crawler(start_site, rest=250)
+        spider = Crawler(start_site,url_depth=url_depth, rest=0)
 
     print 'starting crawl'
     
     datas = []
     for page in spider.crawl(): 
-        print "DATABASE   PUSH     < ----------- |",
-        print page.url
+        #print "DATABASE   PUSH     < ----------- |",
+        #print page.url
         datas.append(page)
 
         """
