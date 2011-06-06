@@ -1,3 +1,10 @@
+"""
+    utils.py
+
+    Contains a function to make strings into a consistent ASCII form without
+    punctuation.
+"""
+
 import string, unicodedata
 
 def sanitize(s):
