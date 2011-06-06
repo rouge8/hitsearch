@@ -52,7 +52,6 @@ That's a terrific question. There's a lot of stuff going on. Let's start in this
 - runserver runs the server at <http://localhost:8000> (actually, <http://0.0.0.0:8000> so you can access it from outside the local machine if say, you're testing this on skittles).
 - setup-dependencies.sh setups in the dependencies. ./install will call it, so don't worry.
 - syncdb sets up the database. also called by ./install
-- tests/, testsite/, and threadtests/ WILL BE EXPLAINED BY CONRAD AND SHOULD MAYBE ALL BE IN ONE FOLDER? :)
 
 This is a lot. And it doesn't even cover the project itself.
 
