@@ -16,7 +16,7 @@ Now you can run the server with the command `./runserver`, or populate the datab
 
 Once the server is running, point your browser to <http://localhost:8000> and search away!
 
-Want to play around like an admin? Go to <http://localhost:8000/admin/>. EXPLAIN WHAT CAN BE DONE
+Want to play around like an admin? Go to <http://localhost:8000/admin/>. The username and password on our massive sample database are both 'admin'. From the admin page you can delete and edit objects as well as search them. It's easier and faster for searching than mucking around in the shell.
 
 EXPLAIN FEATURES ON SEARCH PAGE SPECIFICALLY BETA
 
@@ -61,14 +61,13 @@ We'll only mention things that we've touched (i.e. not simply part of django) or
 Our crawler lives here.
 
 - crawler.py is our actual crawler. documented much more thoroughly in the file.
-- crawlertest.py IS THIS STILL NEEDED?
 - utils.py is a link to utils.py in the parent directory so that we can access our utils nicely.
 
 ## in hitsearch/search/
 
 Our search application!
 
-- admin.py implements parts of the admin module.
+- admin.py registers our models with the admin framework. 
 - models.py contains our database models. explained more in file.
 - static/ contains our static files. Our CSS is done in [LESS](http://lesscss.org/), which has all of the things CSS can do plus so much more.
 - tests.py is a test suite. WE NEED TO USE THIS OR GET RID OF IT
