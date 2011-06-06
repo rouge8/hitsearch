@@ -32,7 +32,7 @@ Dependencies can be removed with `remove-dependencies.sh`.
 -------------------------------------------------
 If you're just interested in the important and interesting stuff, I recommend looking at:
 
-- hitsearch/crawler/crawler.py is the actual threaded crawler.
+- hitsearch/crawler/crawler.py is the actual crawler.
 - hitsearch/search/management/commands/crawl.py is the django command hook that handles interaction between the crawler and the database.
 - hitsearch/HITS.py implements HITS
 - hitsearch/query.py does all the queries
