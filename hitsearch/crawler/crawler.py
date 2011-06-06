@@ -160,16 +160,18 @@ class Page:
         return True
 
 class CrawlerWorker(threading.Thread):
+
     def __init__(self,parent):
         threading.Thread.__init__(self)
         self.parent = parent
+
     def run(self):
         print "thread started",self
         while len(self.pages_to_visit) > 0:#and any(member.is_alive() for member in self.worker_threads):
             if self.crawl_died.is_set():
                 break # kill this thread
             current_page,distance_from_start = self.pages_to_visit_pop()
-            if current_page in self.database or distance_from_start > self.depth:
+            if current_page.url in self.database or distance_from_start > self.depth:
                 print "skipping",current_page
                 continue #to next page on the list
             sleep_time = (self.rest/1000.0) + 2**current_page.timeouts
@@ -188,7 +190,7 @@ class CrawlerWorker(threading.Thread):
                     continue # to next page on the list
                 self.add_page_to_pages_to_visit((current_page, distance_from_start))
 
-            self.add_page_to_database(current_page)
+            self.add_page_to_database(current_page.url)
             
             for url in current_page.links:
                 word_counts = current_page.links[url]
@@ -250,10 +252,8 @@ class Crawler:
                 rest=1000,
                 depth=5):
         
-        self.pages_to_visit = [(Page(start_page),1)]  # queue for pages to load
         # time in ms to wait between pageloads
         self.rest = rest
-        self.database = []
         self.depth = depth if depth > 0 else float("inf") # distance allowed from start page
 
         self.worker_threads = []
@@ -264,6 +264,7 @@ class Crawler:
         # Thread-shared data structures
         self.out_queue = []
         self.database = []
+        self.pages_to_visit = [(Page(start_page),1)]  # queue for pages to load
 
         # Locks for shared data structures
         self.out_queue_lock = threading.Lock()
@@ -293,6 +294,7 @@ class Crawler:
 
 def main():
     start_site = "http://people.carleton.edu/~deanc/testsite/deep/1.html"
+    start_site = "http://people.carleton.edu/~deanc/testsite/a.html"
     #start_site = "http://people.carleton.edu/~deanc/testsite/connected/"
     depth = 600
 
@@ -304,8 +306,8 @@ def main():
     print 'starting crawl'
     
     datas = []
-    for page in spider.crawl(): # database is a list of hitsearch.crawler.Page() objects
-        print "DATABASE",
+    for page in spider.crawl(): 
+        print "DATABASE   PUSH     < ----------- |",
         print page.url
         datas.append(page)
 
