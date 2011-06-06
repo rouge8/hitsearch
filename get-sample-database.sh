@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ -e "hitsearch/hitsearch.db" ]
+then
+    echo "backing up current db"
+    mv "hitsearch/hitsearch.db" "hitsearch/hitsearch.db.bak"
+fi
+
+cd hitsearch/
+wget -c http://people.carleton.edu/~freelana/hitsearch.db
