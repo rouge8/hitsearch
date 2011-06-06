@@ -3,4 +3,4 @@
 ./syncdb
 echo Install script finished!
 echo Use './runserver' to start the server!
-echo "Use './get-sample-database' to download our 240+MB database."
+echo "Use ./get-sample-database to download our 240+MB database."

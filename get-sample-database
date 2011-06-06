@@ -9,4 +9,4 @@ fi
 cd hitsearch/
 wget -c http://people.carleton.edu/~freelana/hitsearch.db
 
-echo "Use './runserver' to run the server!'
+echo "Use ./runserver to run the server!"
