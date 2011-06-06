@@ -1,7 +1,7 @@
 {% extends "search/base.html" %}
 
 {% block main %}
-<div class="search-form">
+<div id="search-form">
 
 <form method="get" action="/">
     <input type="text" name="q" id="q" value="{% if q %}{{ q }}{% endif %}" autofocus>
@@ -9,7 +9,7 @@
     <a href="javascript:void(0);" id="toggleTweakBox">advanced</a>
     <div id="tweakBox">
         <div id="sliderBox">
-            <p id="betaSliderLabel"><strong>beta:</strong></p>
+            <p id="betaSliderLabel"><strong>beta (weights importance of word freq):</strong></p>
             <div id="betaSlider"></div>
             <p id="betaSliderValue">{{ b }}</p>
         </div>

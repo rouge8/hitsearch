@@ -19,9 +19,9 @@ def index(request):
 
     try: # converts b (beta) to a float
         b = float(b)
-        if b > 1.0 or b < 0.0: b = 0.7
+        if b > 1.0 or b < 0.0: b = 0.3
     except Exception:
-        b = .7 # default beta value
+        b = .3 # default beta value
 
     if q: # gets results is there was a query
         results = query.get_results(q, "authority" if s == "a" else "hubbiness", b)

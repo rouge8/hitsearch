@@ -10,14 +10,14 @@ from search.models import *
 import HITS
 import utils
 
-def get_results(query, sort_type='authority', beta=1.0):
+def get_results(query, sort_type='authority', beta=0.0):
     """Queries the database for Page objects matching a query, gets their HITS
        values, weights them by word frequency, and returns a list of sorted
        results.
        sort_type can be either authority or hubbiness
        beta is the weight of the HITS results vs. the word frequency
-       when beta=1.0 HITS results are alll that matters and word frequency is multiplied by zero
-       when beta=0.0 results are based solely on word frequency."""
+       when beta=0.0 HITS results are alll that matters and word frequency is multiplied by zero
+       when beta=1.0 results are based solely on word frequency."""
 
     terms = query.split()
     terms = [utils.sanitize(term).lower() for term in terms] # strips accents and punctuation
@@ -52,8 +52,8 @@ def get_results(query, sort_type='authority', beta=1.0):
         
         # assign the pages hubbiness and authority and weights with term frequency   
         for page in pages:
-            page.authority = beta * authority[page.url] + (1 - beta) * tags[page.url][0] / float(tags[page.url][1])
-            page.hubbiness = beta * hubbiness[page.url] + (1 - beta) * tags[page.url][0] / float(tags[page.url][1])
+            page.authority = (1 - beta) * authority[page.url] + beta * tags[page.url][0] / float(tags[page.url][1])
+            page.hubbiness = (1 - beta) * hubbiness[page.url] + beta * tags[page.url][0] / float(tags[page.url][1])
 
         # sort the pages
         if sort_type == 'hubbiness':

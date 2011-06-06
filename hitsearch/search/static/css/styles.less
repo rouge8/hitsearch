@@ -32,14 +32,14 @@ div#main
     width: 800px;
 }
 
-div.search-form form, div.search-form input, div.search-form button
+div#search-form form, div#search-form input, div#search-form button
 {
     border: 0;
     margin: 0;
     padding: 0;
 }
 
-div.search-form
+div#search-form
 {
     padding: 14px;
     border: solid 2px @border-color;
@@ -47,7 +47,7 @@ div.search-form
     text-align: center;
 }
 
-div.search-form input#q
+div#search-form input#q
 {
     vertical-align: middle;
     font-size: 1.5em;
@@ -56,14 +56,14 @@ div.search-form input#q
     height: 31px;
 }
 
-div.search-form input#b
+div#search-form input#b
 {
     vertical-align: middle;
     border: solid 1px #aacfe4;
     width: 2em;
 }
 
-div.search-form button
+div#search-form button
 {
     vertical-align: middle;
     width: 125px;
@@ -76,29 +76,34 @@ div.search-form button
     font-weight: bold;
 }
 
-div.search-form div#tweakBox
+div#search-form #toggleTweakBox
+{
+    vertical-align: middle;
+}
+
+div#search-form div#tweakBox
 {
     margin-top: 1em;
     display: none;
 }
 
-div.search-form div#tweakBox div#betaSlider, div.search-form div#tweakBox div#sortByRadio
+div#search-form div#tweakBox div#betaSlider, div#search-form div#tweakBox div#sortByRadio
 {
     font-size: 62.5%;
     display: inline-block;
 }
 
-div.search-form div#tweakBox div#betaSlider
+div#search-form div#tweakBox div#betaSlider
 {
     width: 20em;
 }
 
-div.search-form div#tweakBox #betaSliderLabel, div.search-form div#tweakBox p#sortByLabel, div.search-form div#tweakBox p#betaSliderValue
+div#search-form div#tweakBox #betaSliderLabel, div#search-form div#tweakBox p#sortByLabel, div#search-form div#tweakBox p#betaSliderValue
 {
     display: inline;
 }
 
-div.search-form div#tweakBox div#sortBox
+div#search-form div#tweakBox div#sortBox
 {
     margin-top: 1em;
 }
