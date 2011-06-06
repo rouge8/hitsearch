@@ -1,17 +1,3 @@
-QUERY:
-    stop words in query:
-        solution!
-            remove stop words
-        if the query is then empty, put them all back in
-            (or put them back in in order of descending stoppiness?)
-        say which words were ignored
-DOCUMENTATION:
-    writeup how to use it and how it works
-ADMINPAGE:
-    add a button for the crawler and program some crawler feedback so we can see its status
-        button..
-        status..
-            maybe make it write to a logfile?
 CRAWLER:
     PARALLEL CRAWLING
         threads should actually wait till all other threads are waiting, then they all die at once
