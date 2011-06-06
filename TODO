@@ -5,4 +5,16 @@ QUERY:
         if the query is then empty, put them all back in
             (or put them back in in order of descending stoppiness?)
         say which words were ignored
-
+DOCUMENTATION:
+    writeup how to use it and how it works
+ADMINPAGE:
+    add a button for the crawler and program some crawler feedback so we can see its status
+        button..
+        status..
+            maybe make it write to a logfile?
+CRAWLER:
+    parallel crawling
+        threads should actually wait till all other threads are waiting, then they all die at once
+            ###right now a thread crawls until the pages_to_visit queue is empty, and then it'll quit.
+            ###this means as soon as the queue is empty, but pages are still downloading stuff, all of the threads but the active ones will die
+        in the wait state, they should wake up when anything gets put in the queue
