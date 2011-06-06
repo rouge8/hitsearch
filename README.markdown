@@ -1,6 +1,8 @@
 # A `HITS`-based search engine
-
-Google uses PageRank.  HITS is just like PageRank, except it figures out how to automatically deal with spider-traps AND deadends.  Way cool.
+# Data Mining Final Project
+# Conrad Dean, Andy Freeland, Dan Levy
+-------------------------------------------------
+Google uses PageRank.  HITS is just like PageRank, except it figures out how to automatically deal with spider-traps AND deadends.  It also tells you about the hubbiness of pages in addition to their page ranks or authorities as HITS calls it.  Way cool.
 
 This engine is based off the [Django framework](https://www.djangoproject.com/). Our crawler uses all sorts of things from the Python standard library as well as [httplib2](http://code.google.com/p/httplib2/) as our http client and [Beautiful Soup](http://www.crummy.com/software/BeautifulSoup/) which lets us pretend most of the awful HTML on the web is actually beautiful and usable.
 
@@ -9,8 +11,8 @@ We also use a backport of collections.Counter from Python 2.7 to make counting t
 Fortunately we've included the exact versions of everything you need in with the repository so you don't need to download them on your own.  Is that violating some copyright laws? Let's hope not.
 
 # How to Use
-
-Go to the `hitsearch` directory in your terminal and run `./install`.  This will setup all the dependencies (locally, no system installs, so don't worry!) and setup the database.  Also,you will be asked to create an administrator account for the database.
+-------------------------------------------------
+Go to the `hitsearch` directory in your terminal and run `./install`.  This will setup all the dependencies (locally, no system installs, so don't worry!) and setup the database.  Also, you will be asked to create an administrator account for the database.
 
 Now you can run the server with the command `./runserver`, or populate the database with pages by running `./crawl <url> <depth>'. We highly recommend against crawling big sites at a large depth, because it will eat all of your RAM. For example, a wikipedia page with a depth of 5 will destroy your computer.
 
@@ -20,14 +22,14 @@ Once the server is running, point your browser to <http://localhost:8000> and se
 
 Want to play around like an admin? Go to <http://localhost:8000/admin/>. The username and password on our massive sample database are both 'admin'. From the admin page you can delete and edit objects as well as search them. It's easier and faster for searching than mucking around in the shell.
 
-Our search page has a few options that are not found on your typical search engine. We let you sort pages by authority or hubbiness, and we have a beta value. beta can range from 0.0 to 1.0 and it determines how much HITS results will be weighted versus term frequency of your search term, where beta=1.0 is 100% HITS, 0% TF and beta=0.0 is 0% HITS, 100% TF.
+Our search page has a few options that are not found on your typical search engine. We let you sort pages by authority or hubbiness, and we have a beta value. Beta can range from 0.0 to 1.0 and determine how much of the authority and hubbiness are influenced by the word frequency. As beta increases, pages get a boost for every time those terms appear on that page. Thus, when beta=0.0, the authorities and hubbiness are 100% HITS. When beta=0 term frequency is the only thing that matters when ranking pages. If we had more time, we would have liked to have done more with Term Frequency and IDFs to improve our results.
 
 # Cleanup
-
+-------------------------------------------------
 Dependencies can be removed with `remove-dependencies.sh`.
 
 # What are all these files? (interesting version)
-
+-------------------------------------------------
 If you're just interested in the important and interesting stuff, I recommend looking at:
 
 - hitsearch/crawler/crawler.py is the actual threaded crawler.
@@ -37,7 +39,7 @@ If you're just interested in the important and interesting stuff, I recommend lo
 - hitsearch/search/models.py contains our database models
 
 # What are all these files? (complete version)
-
+-------------------------------------------------
 That's a terrific question. There's a lot of stuff going on. Let's start in this directory.
 
 - crawl runs the crawler. run it like ./crawl <url> <depth>
@@ -50,7 +52,6 @@ That's a terrific question. There's a lot of stuff going on. Let's start in this
 - runserver runs the server at <http://localhost:8000> (actually, <http://0.0.0.0:8000> so you can access it from outside the local machine if say, you're testing this on skittles).
 - setup-dependencies.sh setups in the dependencies. ./install will call it, so don't worry.
 - syncdb sets up the database. also called by ./install
-- tests/, testsite/, and threadtests/ WILL BE EXPLAINED BY CONRAD AND SHOULD MAYBE ALL BE IN ONE FOLDER? :)
 
 This is a lot. And it doesn't even cover the project itself.
 
