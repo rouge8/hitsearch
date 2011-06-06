@@ -298,7 +298,7 @@ class Crawler:
                 self.out_queue_lock.release()
                 yield page
         finally:
-            self.crawl_died.set()  # This may be unneccessary...
+            self.crawl_died.set() # when threads see this they'll quit too 
 
 def main():
     start_site = "http://people.carleton.edu/~deanc/testsite/deep/1.html"
