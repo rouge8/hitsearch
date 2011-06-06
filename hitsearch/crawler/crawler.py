@@ -190,7 +190,7 @@ class CrawlerWorker(threading.Thread):
             
             for url in current_page.links:
                 word_counts = current_page.links[url]
-                self.add_page_to_pages_to_visit((Page(url, word_counts), distance_from_start))
+                self.add_page_to_pages_to_visit((Page(url, word_counts), distance_from_start+1))
 
             self.add_page_to_out_queue(current_page)
         print "Thread exit",self
@@ -240,7 +240,7 @@ class Crawler:
                 rest=1000,
                 depth=5):
         
-        self.pages_to_visit = [(Page(start_page),0)]  # queue for pages to load
+        self.pages_to_visit = [(Page(start_page),1)]  # queue for pages to load
         # time in ms to wait between pageloads
         self.rest = rest
         self.database = []
@@ -275,8 +275,8 @@ class Crawler:
             yield page
 
 def main():
-    start_site = "http://people.carleton.edu/~deanc/testsite/a.html"
-    depth = None
+    start_site = "http://people.carleton.edu/~deanc/testsite/deep/1.html"
+    depth = 2
 
     if depth:
         spider = Crawler(start_site,depth=int(depth), rest=250)
