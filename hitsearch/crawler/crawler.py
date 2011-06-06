@@ -165,7 +165,7 @@ class CrawlerWorker(threading.Thread):
         self.parent = parent
     def run(self):
         print "thread started",self
-        while len(self.pages_to_visit) > 0:
+        while len(self.pages_to_visit) > 0:#and any(member.is_alive() for member in self.worker_threads):
             if self.crawl_died.is_set():
                 break # kill this thread
             current_page,distance_from_start = self.pages_to_visit_pop()
@@ -185,7 +185,7 @@ class CrawlerWorker(threading.Thread):
             except TimeoutError as e:
                 print 'TimeoutError', e
                 if current_page.timeouts > 3:
-                    continue
+                    continue # to next page on the list
                 self.add_page_to_pages_to_visit((current_page, distance_from_start))
 
             self.add_page_to_database(current_page)
@@ -227,6 +227,10 @@ class CrawlerWorker(threading.Thread):
     def crawl_died(self):
         return self.parent.crawl_died
 
+    @property
+    def worker_threads(self):
+        return self.parent.worker_threads
+
     def pages_to_visit_pop(self):
         self.parent.pages_to_visit_lock.acquire()
         page_to_vist = self.parent.pages_to_visit.pop(0)
@@ -252,10 +256,9 @@ class Crawler:
         self.database = []
         self.depth = depth if depth > 0 else float("inf") # distance allowed from start page
 
-        # for multi-threaded crawler:not yet
-        #self.worker_threads = []
-        #self.worker_threads.append(CrawlerWorker(self))
-        self.worker_thread = CrawlerWorker(self)
+        self.worker_threads = []
+        self.worker_threads.append(CrawlerWorker(self))
+        #self.worker_thread = CrawlerWorker(self)
 
 
         # Thread-shared data structures
@@ -272,11 +275,12 @@ class Crawler:
 
     def crawl(self):
         self.crawl_died.clear() # let the threads thrive
-        self.worker_thread.start()# start the crawl
-        try:
-            while True:
-                if len(self.out_queue) == 0 and not self.worker_thread.is_alive():
-                    raise StopIteration
+        for worker in self.worker_threads:
+            worker.start()# start the crawl
+        while True:
+            if len(self.out_queue) == 0 and not any(w.is_alive() for w in self.worker_threads):
+                raise StopIteration
+            try:
                 if len(self.out_queue) == 0:
                     time.sleep(.05)
                     continue
@@ -284,9 +288,10 @@ class Crawler:
                 page = self.out_queue.pop(0)
                 self.out_queue_lock.release()
                 yield page
-        except:
-            self.crawl_died.set() #kill the threads
-            raise Exception # kill the program
+            except Exception, e:
+                self.crawl_died.set() #kill the threads
+                print type(e),e
+                raise Exception # kill the program
         self.crawl_died.set()  # This may be unneccessary...
 
 def main():
