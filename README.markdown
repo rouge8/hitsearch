@@ -12,7 +12,9 @@ Fortunately we've included the exact versions of everything you need in with the
 ------------------------------
 Go to the `hitsearch` directory in your terminal and run `./install`.  This will setup all the dependencies (locally, no system installs, so don't worry!) and setup the database.  Also, you will be asked to create an administrator account for the database.
 
-Now you can run the server with the command `./runserver`, or populate the database with pages by running `./crawl <url> <depth>'. We highly recommend against crawling big sites at a large depth, because it will eat all of your RAM.
+Now you can run the server with the command `./runserver`, or populate the database with pages by running `./crawl <url> <depth>'. We highly recommend against crawling big sites at a large depth, because it will eat all of your RAM. For example, a wikipedia page with a depth of 5 will destroy your computer.
+
+If you want our fairly large (230+MB, 211000+ pages!) database, you can download it from <http://people.carleton.edu/~freelana/hitsearch.db>.
 
 Once the server is running, point your browser to <http://localhost:8000> and search away!
 
