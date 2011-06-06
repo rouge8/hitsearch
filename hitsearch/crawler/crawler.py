@@ -230,6 +230,7 @@ class CrawlerWorker(threading.Thread):
 
             self.add_page_to_out_queue(current_page)
         print "Thread exit",self
+        print "pages left to write to DB",len(self.parent.out_queue)
 
     def add_page_to_out_queue(self,page):
         self.parent.out_queue_lock.acquire()
