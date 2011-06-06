@@ -1,3 +1,5 @@
 #!/bin/bash
 ./setup-dependencies.sh
 ./syncdb
+echo Install script finished!
+echo Use './runserver' to start the server!
