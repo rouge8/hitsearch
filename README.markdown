@@ -24,7 +24,17 @@ Our search page has a few options that are not found on your typical search engi
 
 Dependencies can be removed with `remove-dependencies.sh`.
 
-# What are all these files?
+# What are all these files? (interesting version)
+
+If you're just interested in the important and interesting stuff, I recommend looking at:
+
+- hitsearch/crawler/crawler.py is the actual threaded crawler.
+- hitsearch/search/management/commands/crawl.py is the django command hook that handles interaction between the crawler and the database.
+- hitsearch/HITS.py implements HITS
+- hitsearch/query.py does all the queries
+- hitsearch/search/models.py contains our database models
+
+# What are all these files? (complete version)
 
 That's a terrific question. There's a lot of stuff going on. Let's start in this directory.
 
