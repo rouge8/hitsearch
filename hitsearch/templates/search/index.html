@@ -4,16 +4,39 @@
 <div class="search-form">
 
 <form method="get" action="/">
-    <input type="text" name="q" id="q" autofocus>
-    <button type="submit" class="fancy search_button">Search</button><br>
-    <div style="margin-top: 1em;">
-    <strong>beta:</strong>
-    <input type="text" name="b" id="b" value=".7">
-    <strong>sort by:</strong>
-    <input type="radio" name="s" value="a"{% if s != 'h' %} checked{% endif %}> <label for="s">authority</label> |
-    <input type="radio" name="s" value="h"{% if s == 'h' %}checked{% endif %}> <label for="s">hubbiness</label>
+    <input type="text" name="q" id="q" value="{% if q %}{{ q }}{% endif %}" autofocus>
+    <button type="submit" class="fancy search_button">Search</button>
+    <a href="javascript:void(0);" id="toggleTweakBox">advanced</a>
+    <div id="tweakBox">
+        <div id="sliderBox">
+            <p id="betaSliderLabel"><strong>beta:</strong></p>
+            <div id="betaSlider"></div>
+            <p id="betaSliderValue">{{ b }}</p>
+        </div>
+        
+        <div id="sortBox">
+            <p id="sortByLabel"><strong>sort results by:</strong></p>
+            <div id="sortByRadio">
+                <input type="radio" name="s" id="sortByRadio1" value="a"{% if s != 'h' %} checked{% endif %}><label for="sortByRadio1">authority</label>
+                <input type="radio" name="s" id="sortByRadio2" value="h"{% if s == 'h' %} checked{% endif %}><label for="sortByRadio2">hubbiness</label>
+            </div>
+        </div>
     </div>
+    <input type="hidden" name="b" id="b" value="{{ b }}">
 </form>
 
+</div>
+
+<div id="results">
+{% if results %}{% for result in results %}
+<div class="result">
+    <h3><span class="fancy">{{ forloop.counter }}.</span> <a href="{{ result.url }}">{{ result.title|safe }}</a></h3>
+    <p><a href="{{ result.url }}">{{ result.url }}</a></p>
+    <p>authority: {{ result.authority|floatformat:5 }} | hubbiness: {{ result.hubbiness|floatformat:5 }}</p>
+</div>
+{% endfor %}{% else %}{% if q %}
+<div class="result">
+    <h3>Sorry, no results</h3>
+</div>{% endif %}{% endif %}
 </div>
 {% endblock %}
