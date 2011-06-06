@@ -44,16 +44,19 @@ class TimeoutError(Exception):
     pass
 
 class Page:
+    """Page objects used by the crawler."""
+
     def __init__(self, url, url_depth, word_counts=[]):
-        self.links = defaultdict(list)
+        self.links = defaultdict(list) # a dictionary of {urls: [link text]}
         self.word_counts = Counter(word_counts)
         self.url = self.standardize_url(url)
         self.title = ''
         self.parsed = False
-        self.url_depth = url_depth
-        self.timeouts = 0
+        self.url_depth = url_depth ## CONRAD EXPLAIN THIS
+        self.timeouts = 0 # number of times page has timed out
 
     def parse(self):
+        """Loads and parses the page."""
         try:
             self.parse_page()
             self.parsed = True
@@ -71,6 +74,8 @@ class Page:
             resp, page = h.request(self.url, 'GET')
         except AttributeError:
             raise httplib2.HttpLib2Error('could not open a socket for %s.' %self.url)
+
+        # parses only the parts of the page that we want
         strainer = BeautifulSoup.SoupStrainer({'a': True, 'title': True, 'body': True, 'script': True})
         try:
             soup = BeautifulSoup.BeautifulSoup(page, parseOnlyThese=strainer) # what if it fails to parse?
@@ -78,14 +83,15 @@ class Page:
             raise ParseError('%s is not HTML.' % self.url)
         except httplib.IncompleteRead, e:
             raise ParseError(self.url +' '+  str(e))
-        links = soup('a')
-        self.get_links(links)
         try:
             self.get_content(soup)
+            links = soup('a')
+            self.get_links(links)
         except Exception, e:
             raise ParseError( '%s could not be parsed.' % self.url )
 
     def get_links(self, links):
+        """Gets the links on the page and their link texts."""
         for link in links:
             target = link.get('href', '')
             if target != '':
@@ -101,6 +107,7 @@ class Page:
 
 
     def get_content(self, soup):
+        """Gets counts of all of the words on the page."""
         # based on http://groups.google.com/group/beautifulsoup/browse_thread/thread/9f6278ee2a2e4564
         # remove comments
         comments = soup(text=lambda text:isinstance(text, 
@@ -283,6 +290,9 @@ class CrawlerWorker(threading.Thread):
         
 
 class Crawler:
+    """Crawler object crawls web pages. Has parameters start_page=url, rest=milliseconds,
+       url_depth=MAGIC FOR CONRAD, and depth=depth of crawler. Uses threads and
+       lots of RAM."""
 
     def __init__(self,
                 start_page,
