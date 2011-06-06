@@ -277,10 +277,10 @@ class Crawler:
         self.crawl_died.clear() # let the threads thrive
         for worker in self.worker_threads:
             worker.start()# start the crawl
-        while True:
-            if len(self.out_queue) == 0 and not any(w.is_alive() for w in self.worker_threads):
-                raise StopIteration
-            try:
+        try:
+            while True:
+                if len(self.out_queue) == 0 and not any(w.is_alive() for w in self.worker_threads):
+                    raise StopIteration
                 if len(self.out_queue) == 0:
                     time.sleep(.05)
                     continue
@@ -288,11 +288,8 @@ class Crawler:
                 page = self.out_queue.pop(0)
                 self.out_queue_lock.release()
                 yield page
-            except Exception, e:
-                self.crawl_died.set() #kill the threads
-                print type(e),e
-                raise Exception # kill the program
-        self.crawl_died.set()  # This may be unneccessary...
+        finally:
+            self.crawl_died.set()  # This may be unneccessary...
 
 def main():
     start_site = "http://people.carleton.edu/~deanc/testsite/deep/1.html"
