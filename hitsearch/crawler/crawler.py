@@ -166,6 +166,8 @@ class CrawlerWorker(threading.Thread):
     def run(self):
         print "thread started",self
         while len(self.pages_to_visit) > 0:
+            if self.crawl_died.is_set():
+                break # kill this thread
             current_page,distance_from_start = self.pages_to_visit_pop()
             if current_page in self.database or distance_from_start > self.depth:
                 print "skipping",current_page
@@ -221,6 +223,10 @@ class CrawlerWorker(threading.Thread):
     def pages_to_visit(self):
         return self.parent.pages_to_visit
 
+    @property
+    def crawl_died(self):
+        return self.parent.crawl_died
+
     def pages_to_visit_pop(self):
         self.parent.pages_to_visit_lock.acquire()
         page_to_vist = self.parent.pages_to_visit.pop(0)
@@ -261,22 +267,32 @@ class Crawler:
         self.database_lock= threading.Lock()
         self.pages_to_visit_lock= threading.Lock()
 
+        # Event for killing all threads
+        self.crawl_died = threading.Event()
+
     def crawl(self):
-        self.worker_thread.start()
-        while True:
-            if len(self.out_queue) == 0 and not self.worker_thread.is_alive():
-                raise StopIteration
-            if len(self.out_queue) == 0:
-                time.sleep(.05)
-                continue
-            self.out_queue_lock.acquire()
-            page = self.out_queue.pop(0)
-            self.out_queue_lock.release()
-            yield page
+        self.crawl_died.clear() # let the threads thrive
+        self.worker_thread.start()# start the crawl
+        try:
+            while True:
+                if len(self.out_queue) == 0 and not self.worker_thread.is_alive():
+                    raise StopIteration
+                if len(self.out_queue) == 0:
+                    time.sleep(.05)
+                    continue
+                self.out_queue_lock.acquire()
+                page = self.out_queue.pop(0)
+                self.out_queue_lock.release()
+                yield page
+        except:
+            self.crawl_died.set() #kill the threads
+            raise Exception # kill the program
+        self.crawl_died.set()  # This may be unneccessary...
 
 def main():
     start_site = "http://people.carleton.edu/~deanc/testsite/deep/1.html"
-    depth = 2
+    #start_site = "http://people.carleton.edu/~deanc/testsite/connected/"
+    depth = 600
 
     if depth:
         spider = Crawler(start_site,depth=int(depth), rest=250)
@@ -287,10 +303,11 @@ def main():
     
     datas = []
     for page in spider.crawl(): # database is a list of hitsearch.crawler.Page() objects
-        print "NEW PAGE"
+        print "DATABASE",
         print page.url
         datas.append(page)
 
+        """
         # save links!
         print "save links"
         for link in page.links:
@@ -302,6 +319,7 @@ def main():
         for word in page.word_counts.keys():
             print "\t",
             print word
+        """
     print len(datas), "pages found"
 
 if __name__ == '__main__':
