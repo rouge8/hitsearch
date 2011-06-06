@@ -69,3 +69,4 @@ class Command(BaseCommand):
                     word_object.save()
                 
             transaction.commit() # commits this very large transaction to the database
+            print 'page %s saved' %page.url

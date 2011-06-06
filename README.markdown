@@ -14,11 +14,13 @@ Fortunately we've included the exact versions of everything you need in with the
 -------------------------------------------------
 Go to the `hitsearch` directory in your terminal and run `./install`.  This will setup all the dependencies (locally, no system installs, so don't worry!) and setup the database.  Also, you will be asked to create an administrator account for the database.
 
-Now you can run the server with the command `./runserver`, or populate the database with pages by running `./crawl <url> <depth>'. We highly recommend against crawling big sites at a large depth, because it will eat all of your RAM. For example, a wikipedia page with a depth of 5 will destroy your computer.
+Now you can run the server with the command `./runserver`.
 
 If you want our fairly large (230+MB, 211000+ pages!) database, you can download it from <http://people.carleton.edu/~freelana/hitsearch.db> or run ./get-sample-database
 
 Once the server is running, point your browser to <http://localhost:8000> and search away!
+
+You can also populate the database with pages yourself by running `./crawl <url> <depth>'. We highly recommend against crawling big sites at a large depth, because it will eat all of your RAM. For example, a wikipedia page with a depth of 5 will destroy your computer. This is in part because sqlite is very very fast on reads and very very very slow on writes. Surprisingly, this is not dependent on the size of the database as far as we can tell, through multiple tests.
 
 Want to play around like an admin? Go to <http://localhost:8000/admin/>. The username and password on our massive sample database are both 'admin'. From the admin page you can delete and edit objects as well as search them. It's easier and faster for searching than mucking around in the shell.
 
