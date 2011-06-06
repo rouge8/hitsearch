@@ -16,7 +16,7 @@ Go to the `hitsearch` directory in your terminal and run `./install`.  This will
 
 Now you can run the server with the command `./runserver`, or populate the database with pages by running `./crawl <url> <depth>'. We highly recommend against crawling big sites at a large depth, because it will eat all of your RAM. For example, a wikipedia page with a depth of 5 will destroy your computer.
 
-If you want our fairly large (230+MB, 211000+ pages!) database, you can download it from <http://people.carleton.edu/~freelana/hitsearch.db>.
+If you want our fairly large (230+MB, 211000+ pages!) database, you can download it from <http://people.carleton.edu/~freelana/hitsearch.db> or run ./get-sample-database
 
 Once the server is running, point your browser to <http://localhost:8000> and search away!
 
@@ -45,6 +45,7 @@ That's a terrific question. There's a lot of stuff going on. Let's start in this
 - crawl runs the crawler. run it like ./crawl <url> <depth>
 - deps/ contains all the dependencies.
 - django-admin.py lets you start django projects and apps and all that. don't worry about it.
+- ./get-sample-database downloads our sample database
 - hitsearch/ contains the the hitsearch project. we'll get to that in a bit.
 - ./install sets up all the dependencies and creates the initial database at hitsearch/hitsearch.db
 - README.markdown is this.
