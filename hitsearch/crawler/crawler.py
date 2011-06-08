@@ -199,10 +199,17 @@ class CrawlerWorker(threading.Thread):
 
     def run(self):
         print "thread started",self
-        while len(self.pages_to_visit) > 0:#and any(member.is_alive() for member in self.worker_threads):
+        #while len(self.pages_to_visit) > 0:#and any(member.is_alive() for member in self.worker_threads):
+        while True:
+            self.pages_to_visit_empty_lock.acquire()
+            while len(self.pages_to_visit) == 0:
+                self.waiting_threads_up()
+                self.pages_to_visit_empty_lock.wait()
+                self.waiting_threads_up()
             if self.crawl_died.is_set():
-                break # kill this thread
+                break
             current_page,distance_from_start = self.pages_to_visit_pop()
+            self.pages_to_visit_empty_lock.release()
             if current_page.url in self.database or distance_from_start > self.depth:
                 print "skipping",current_page.url
                 continue #to next page on the list
@@ -275,11 +282,33 @@ class CrawlerWorker(threading.Thread):
         page_to_vist = self.parent.pages_to_visit.pop(0)
         self.parent.pages_to_visit_lock.release()
         return page_to_vist
+    
+    @property
+    def pages_to_visit_empty_lock(self):
+        return self.parent.pages_to_visit_empty_lock
+    
+    @property
+    def waiting_threads(self):
+        return self.parent.waiting_threads
+    
+    def waiting_threads_up(self):
+        self.parent.waiting_threads_lock.acquire()
+        self.parent.waiting_threads += 1
+        self.parent.waiting_threads_lock.release()
+        
+    def waiting_threads_down(self):
+        self.parent.waiting_threads_lock.acquire()
+        self.parent.waiting_threads -= 1
+        self.parent.waiting_threads_lock.release()
         
     def add_page_to_pages_to_visit(self,page):
         self.parent.pages_to_visit_lock.acquire()
         self.parent.pages_to_visit.append(page)
         self.parent.pages_to_visit_lock.release()
+
+        self.pages_to_visit_empty_lock.acquire()
+        self.pages_to_visit_empty_lock.notify_all()
+        self.pages_to_visit_empty_lock.release()
         
 
 class Crawler:
@@ -310,11 +339,14 @@ class Crawler:
         self.out_queue = []
         self.database = []
         self.pages_to_visit = [(Page(start_page,self.url_depth),1)]  # queue for pages to load
+        self.waiting_threads = 0
 
         # Locks for shared data structures
         self.out_queue_lock = threading.Lock()
         self.database_lock= threading.Lock()
         self.pages_to_visit_lock= threading.Lock()
+        self.pages_to_visit_empty_lock = threading.Condition()
+        self.waiting_threads_lock = threading.Lock()
 
         # Event for killing all threads
         self.crawl_died = threading.Event()
@@ -325,6 +357,13 @@ class Crawler:
             worker.start()# start the crawl
         try:
             while True:
+                if len(self.pages_to_visit) == 0 \
+                    and not any(w.is_alive() for w in self.worker_threads)\
+                    and len(self.worker_threads) == self.waiting_threads:
+                    self.crawl_died.set()
+                    self.pages_to_visit_empty_lock.acquire()
+                    self.pages_to_visit_empty_lock.notify_all()
+                    self.pages_to_visit_empty_lock.release()
                 if len(self.out_queue) == 0 and not any(w.is_alive() for w in self.worker_threads):
                     raise StopIteration
                 if len(self.out_queue) == 0:
