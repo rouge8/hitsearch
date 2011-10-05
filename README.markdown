@@ -20,7 +20,7 @@ If you want our fairly large (230+MB, 211000+ pages!) database, you can download
 
 Once the server is running, point your browser to <http://localhost:8000> and search away!
 
-You can also populate the database with pages yourself by running `./crawl <url> <depth>'. We highly recommend against crawling big sites at a large depth, because it will eat all of your RAM. For example, a wikipedia page with a depth of 5 will destroy your computer. This is in part because sqlite is very very fast on reads and very very very slow on writes. Surprisingly, this is not dependent on the size of the database as far as we can tell, through multiple tests. If we had more time, we would explore python's weakrefs and garbage collection to collect things manually or just make the garbage collection more aggressive, which would hopefully cut down on memory use. We naively tried gc.collect() in a few places, but it didn't make a difference. Weakrefs might be our actual problem.
+You can also populate the database with pages yourself by running `./crawl <url> <depth>'. For a while, this would eat all of our RAM for no apparent reason, no matter what we tried. We did some more research and discovered that Django's debug mode does not garbage collect objects written to the database. Turning off debug mode made the crawler manageable.
 
 Want to play around like an admin? Go to <http://localhost:8000/admin/>. The username and password on our massive sample database are both 'admin'. From the admin page you can delete and edit objects as well as search them. It's easier and faster for searching than mucking around in the shell.
 
