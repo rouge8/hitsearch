@@ -1,1 +1,2 @@
+#!/bin/sh
 hitsearch/manage.py crawl $@
